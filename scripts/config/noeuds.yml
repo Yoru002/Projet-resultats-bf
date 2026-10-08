@@ -1,0 +1,21 @@
+---
+- nom: bdd1
+  ip: 192.168.59.31
+  mem: 768
+  role: bdd
+- nom: bdd2
+  ip: 192.168.59.32
+  mem: 768
+  role: replique
+- nom: app1
+  ip: 192.168.59.21
+  mem: 512
+  role: app
+- nom: app2
+  ip: 192.168.59.22
+  mem: 512
+  role: app
+- nom: lb1
+  ip: 192.168.59.11
+  mem: 512
+  role: lb
