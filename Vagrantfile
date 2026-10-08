@@ -56,7 +56,10 @@ Vagrant.configure("2") do |config|
         "PRIMARY_IP" => "#{RESEAU}.31", "REPLICA_IP" => "#{RESEAU}.32",
         "VIP" => VIP, "LB2" => AVEC_LB2 ? "1" : "0"
       )
-      
+      m.vm.provision "shell", path: "scripts/common.sh", env: env
+      # lb : "always" pour régénérer HAProxy à chaque démarrage
+      m.vm.provision "shell", path: "scripts/#{n['role']}.sh", env: env,
+                     run: (n["role"] == "lb" ? "always" : "once")
     end
   end
 end
