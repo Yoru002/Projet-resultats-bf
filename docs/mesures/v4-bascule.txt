@@ -1,0 +1,12 @@
+[1/4] bdd2 est-elle demarree ?
+[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
+REFUS : bdd1 repond encore. Promouvoir bdd2 creerait deux primaires.
+[1/4] bdd2 est-elle demarree ?
+[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
+[3/4] bdd2 est-elle bien une replique ?
+[4/4] Promotion de bdd2
+OK : bdd2 est maintenant la base primaire.
+Duree de la bascule : 9.7 s
+INSERT 0 1
+ 50001
+
