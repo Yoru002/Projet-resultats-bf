@@ -1,4 +1,4 @@
 .env
 .vagrant/
-config/noeuds.yml
+**/noeuds.yml
 *.log
