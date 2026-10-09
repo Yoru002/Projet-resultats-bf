@@ -1,0 +1,7 @@
+R5 - ecriture sur bdd1, lecture sur bdd2 - ven. 09 oct. 2026 00:00:57 GMT
+INSERT 0 1
+ matricule  |   nom   | serie | moyenne | admis 
+------------+---------+-------+---------+-------
+ TEST000001 | Test R5 | A     |   12.50 | t
+(1 row)
+
