@@ -10,3 +10,17 @@ Duree de la bascule : 9.7 s
 INSERT 0 1
  50001
 
+=== Essai 2 - ven. 09 oct. 2026 21:24:26 GMT ===
+[1/4] bdd2 est-elle demarree ?
+[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
+[3/4] bdd2 est-elle bien une replique ?
+[4/4] Promotion de bdd2
+OK : bdd2 est maintenant la base primaire.
+Duree de la bascule : 10.4 s
+=== Essai 3 - ven. 09 oct. 2026 21:29:44 GMT ===
+[1/4] bdd2 est-elle demarree ?
+[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
+[3/4] bdd2 est-elle bien une replique ?
+[4/4] Promotion de bdd2
+OK : bdd2 est maintenant la base primaire.
+Duree de la bascule : 10.0 s
