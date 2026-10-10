@@ -22,8 +22,9 @@ install -d -m 755 /opt/resultats
 # Environnement du service : le mot de passe ne passe que par /etc/default,
 # jamais dans le dépôt (R7) ni dans la ligne de commande (ps visible)
 cat > /tmp/resultats.env <<EOF
-DB_HOST=${PRIMARY_IP},${REPLICA_IP}
+DB_HOST=${REPLICA_IP},${PRIMARY_IP}
 DB_TARGET=read-write
+DB_TIMEOUT=2
 DB_PORT=5432
 DB_NAME=resultats
 DB_USER=appuser

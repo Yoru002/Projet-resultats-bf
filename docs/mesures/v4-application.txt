@@ -25,3 +25,18 @@ Duree de la bascule : 9.8 s
 Retour a 200 apres 12.8 s (bascule comprise)
 {"matricule": "BF000001", "nom": "Candidat 1", "serie": "C", "moyenne": 0.37, "admis": false}{"ok": true, "host": "app1"}
 HTTP 200 en 3.015081s
+=== APRES reglage DB_TIMEOUT=1 (bdd1 arretee, bdd2 primaire) - sam. 10 oct. 2026 16:49:39 GMT ===
+{"ok": true, "host": "app1"}
+HTTP 200 en 2.020184s
+{"ok": true, "host": "app1"}
+HTTP 200 en 2.014475s
+{"matricule": "BF000001", "nom": "Candidat 1", "serie": "C", "moyenne": 0.37, "admis": false}
+HTTP 200 en 2.018041s
+=== ORDRE bdd2,bdd1 + DB_TIMEOUT=2 (bdd1 arretee, bdd2 primaire) - sam. 10 oct. 2026 16:54:24 GMT ===
+{"ok": true, "host": "app1"}
+HTTP 200 en 0.013672s
+=== ORDRE bdd2,bdd1 - fonctionnement normal - sam. 10 oct. 2026 17:02:06 GMT ===
+{"ok": true, "host": "app1"}
+HTTP 200 en 0.024996s
+{"matricule": "BF000001", "nom": "Candidat 1", "serie": "C", "moyenne": 0.37, "admis": false}
+HTTP 200 en 0.032457s
