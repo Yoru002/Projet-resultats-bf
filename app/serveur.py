@@ -24,6 +24,7 @@ DB = {
     "dbname": os.environ.get("DB_NAME", "resultats"),
     "user": os.environ.get("DB_USER", "appuser"),
     "password": os.environ.get("DB_PASSWORD", ""),
+    "target_session_attrs": os.environ.get("DB_TARGET", "any"),
     "connect_timeout": 3,
 }
 
