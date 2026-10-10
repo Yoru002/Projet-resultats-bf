@@ -16,6 +16,17 @@ mesure() {  # $1 = libellé, $2 = chemin
 
 {
 echo "=== V4 avec application - $(date) ==="
+echo "--- 0. Attente de disponibilite : /sante doit repondre 200 ---"
+t0=$(date +%s.%N)
+code=000
+for i in $(seq 1 60); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' --max-time 10 "${URL}/sante")
+  [ "$code" = 200 ] && break
+  sleep 1
+done
+t1=$(date +%s.%N)
+awk -v a="$t0" -v b="$t1" -v c="$code" 'BEGIN{printf "Dernier code : %s apres %.1f s d attente\n", c, b-a}'
+[ "$code" = 200 ] || { echo "ABANDON : /sante ne repond pas 200 avant la panne"; exit 1; }
 echo "--- 1. Fonctionnement normal (bdd1 primaire) ---"
 mesure "/sante" /sante
 mesure "/resultat" "/resultat?matricule=BF000001"
