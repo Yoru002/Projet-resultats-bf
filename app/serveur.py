@@ -86,9 +86,8 @@ class Handler(BaseHTTPRequestHandler):
                          "moyenne": float(moyenne), "admis": bool(admis)})
 
     def do_HEAD(self):   # en-têtes seuls, sans corps ni accès à la base
-        code = 200 if urlparse(self.path).path in ("/info", "/sante") else 404
+        code = 200 if urlparse(self.path).path == "/info" else 404
         self.send_response(code)
-        self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", "0")
         self.end_headers()
 
