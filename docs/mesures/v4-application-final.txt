@@ -1,0 +1,17 @@
+=== V4 avec application - sam. 10 oct. 2026 17:16:18 GMT ===
+--- 1. Fonctionnement normal (bdd1 primaire) ---
+/sante : HTTP 503 en 2.016625s
+/resultat : HTTP 503 en 2.013859s
+--- 2. bdd1 arretee, bdd2 encore en lecture seule ---
+/sante : HTTP 503 en 2.014664s
+--- 3. Bascule, puis attente du retour a 200 ---
+[1/4] bdd2 est-elle demarree ?
+[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
+[3/4] bdd2 est-elle bien une replique ?
+[4/4] Promotion de bdd2
+OK : bdd2 est maintenant la base primaire.
+Duree de la bascule : 9.7 s
+Dernier code : 200 ; retour a 200 apres 9.7 s (bascule comprise)
+--- 4. Apres bascule (bdd2 primaire) ---
+/sante : HTTP 200 en 0.009351s
+/resultat : HTTP 200 en 0.012973s
