@@ -95,5 +95,5 @@ class Handler(BaseHTTPRequestHandler):
         self._json(405, {"erreur": "méthode non autorisée"})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("APP_PORT", "8000"))
+    port = int(os.environ.get("APP_PORT", "3000"))
     ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()

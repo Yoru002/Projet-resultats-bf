@@ -7,7 +7,7 @@ cd "$(dirname "$0")/.."
 
 [ -f config/noeuds.yml ] || { echo "config/noeuds.yml absent : lancez d'abord une commande vagrant"; exit 1; }
 IP_APP=$(awk '/nom: app1/{f=1} f&&/ip:/{print $2; exit}' config/noeuds.yml)
-URL="http://${IP_APP}:8000"
+URL="http://${IP_APP}:3000"
 SORTIE="${1:-docs/mesures/v4-application-final.txt}"
 
 mesure() {  # $1 = libellé, $2 = chemin
