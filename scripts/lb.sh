@@ -11,4 +11,8 @@ if install_si_different /tmp/haproxy.cfg /etc/haproxy/haproxy.cfg; then
 fi
 systemctl enable haproxy >/dev/null 2>&1
 systemctl is-active --quiet haproxy
+
+if [ "${LB2:-0}" = "1" ]; then
+  bash /vagrant/scripts/keepalived.sh
+fi
 echo "lb provisionne, HAProxy actif"

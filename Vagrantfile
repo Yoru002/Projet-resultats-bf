@@ -4,7 +4,7 @@ require 'fileutils'
 
 GROUPE   = (ENV['GROUPE'] || 4).to_i
 NB_APP   = (ENV['NB_APP'] || 2).to_i
-AVEC_LB2 = ENV['LB2'] == '1'            # extension E1
+AVEC_LB2 = ENV['LB2'] != '0'            # extension E1 : active par défaut, LB2=0 pour l'éteindre
 RESEAU   = "192.168.#{55 + GROUPE}"
 VIP      = "#{RESEAU}.5"
 BOITE    = "bento/ubuntu-24.04"
@@ -29,8 +29,11 @@ end
 NOEUDS << { "nom" => "lb1", "ip" => "#{RESEAU}.11", "mem" => 512, "role" => "lb" }
 NOEUDS << { "nom" => "lb2", "ip" => "#{RESEAU}.12", "mem" => 512, "role" => "lb" } if AVEC_LB2
 
-FileUtils.mkdir_p("config")
-File.write("config/noeuds.yml", NOEUDS.to_yaml)
+# Chemin absolu : le fichier atterrit toujours dans config/ à la racine,
+# même si vagrant est lancé depuis un sous-dossier
+CONFIG_DIR = File.join(__dir__, "config")
+FileUtils.mkdir_p(CONFIG_DIR)
+File.write(File.join(CONFIG_DIR, "noeuds.yml"), NOEUDS.to_yaml)
 
 Vagrant.configure("2") do |config|
   config.vm.box = BOITE
@@ -47,8 +50,6 @@ Vagrant.configure("2") do |config|
       m.vm.provider "virtualbox" do |vb|
         vb.memory = n["mem"]
         vb.cpus = 1
-        # utile pour la VIP VRRP si elle n'est pas joignable depuis l'hôte :
-        # vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]
       end
 
       env = SECRETS.merge(
