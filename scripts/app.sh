@@ -29,7 +29,7 @@ DB_PORT=5432
 DB_NAME=resultats
 DB_USER=appuser
 DB_PASSWORD=${DB_PASSWORD}
-APP_PORT=8000
+APP_PORT=3000
 EOF
 # lib.sh renvoie 0 si le fichier a été (ré)installé, 1 s'il était déjà à jour
 CHANGED=0
@@ -68,8 +68,8 @@ fi
 systemctl is-active --quiet resultats
 REPONDU=0
 for i in $(seq 1 10); do
-  if curl -fsS --max-time 2 http://127.0.0.1:8000/info; then REPONDU=1; break; fi
+  if curl -fsS --max-time 2 http://127.0.0.1:3000/info; then REPONDU=1; break; fi
   sleep 1
 done
-[ "${REPONDU}" = 1 ] || { echo "ECHEC : le service ne repond pas sur :8000"; exit 1; }
-echo " app provisionne, ecoute sur 0.0.0.0:8000"
+[ "${REPONDU}" = 1 ] || { echo "ECHEC : le service ne repond pas sur :3000"; exit 1; }
+echo " app provisionne, ecoute sur 0.0.0.0:3000"
