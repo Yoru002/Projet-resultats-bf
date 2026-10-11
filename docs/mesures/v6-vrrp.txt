@@ -1,0 +1,29 @@
+=== V6 panne de lb1 - Sun Oct 11 22:28:30     2026 ===
+VIP : 192.168.59.5
+Requetes totales : 253
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Sun Oct 11 22:40:42     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 250
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Sun Oct 11 22:46:38     2026 ===
+VIP : 192.168.59.5
+Mode : brutal
+Requetes totales : 57
+Requetes en echec : 3, coupure d environ 2898 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Sun Oct 11 22:53:06     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 88
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Sun Oct 11 22:55:35     2026 ===
+VIP : 192.168.59.5
+Mode : brutal
+Requetes totales : 53
+Requetes en echec : 2, coupure d environ 1546 ms
+Derniere reponse : HTTP 200
