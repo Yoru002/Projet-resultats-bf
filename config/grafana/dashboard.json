@@ -1,0 +1,28 @@
+{
+  "uid": "resultats-bf",
+  "title": "RESULTATS-BF",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": {"from": "now-15m", "to": "now"},
+  "panels": [
+    {"id": 1, "type": "timeseries", "title": "Requêtes par seconde (HAProxy)",
+     "datasource": {"type": "prometheus", "uid": "prometheus"},
+     "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+     "targets": [{"refId": "A", "expr": "sum(rate(haproxy_frontend_http_requests_total{proxy=\"web\"}[15s]))", "legendFormat": "req/s"}]},
+    {"id": 2, "type": "timeseries", "title": "CPU par machine (%)",
+     "datasource": {"type": "prometheus", "uid": "prometheus"},
+     "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+     "targets": [{"refId": "A", "expr": "100 - avg by (nom) (rate(node_cpu_seconds_total{job=\"node\",mode=\"idle\"}[15s])) * 100", "legendFormat": "{{nom}}"}]},
+    {"id": 3, "type": "state-timeline", "title": "Serveurs applicatifs vus par HAProxy",
+     "datasource": {"type": "prometheus", "uid": "prometheus"},
+     "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8},
+     "fieldConfig": {"defaults": {"mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+     "targets": [{"refId": "A", "expr": "max by (server) (haproxy_server_status{proxy=\"apps\",state=\"UP\"})", "legendFormat": "{{server}}"}]},
+    {"id": 4, "type": "state-timeline", "title": "Machines supervisées",
+     "datasource": {"type": "prometheus", "uid": "prometheus"},
+     "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8},
+     "fieldConfig": {"defaults": {"mappings": [{"type": "value", "options": {"0": {"text": "DOWN", "color": "red"}, "1": {"text": "UP", "color": "green"}}}]}, "overrides": []},
+     "targets": [{"refId": "A", "expr": "up{job=\"node\"}", "legendFormat": "{{nom}}"}]}
+  ]
+}

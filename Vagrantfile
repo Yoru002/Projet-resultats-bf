@@ -5,6 +5,7 @@ require 'fileutils'
 GROUPE   = (ENV['GROUPE'] || 4).to_i
 NB_APP   = (ENV['NB_APP'] || 2).to_i
 AVEC_LB2 = ENV['LB2'] != '0'            # extension E1 : active par défaut, LB2=0 pour l'éteindre
+AVEC_OBS = ENV['OBS'] != '0'            # extension E2 : active par défaut, OBS=0 pour l'éteindre
 RESEAU   = "192.168.#{55 + GROUPE}"
 VIP      = "#{RESEAU}.5"
 BOITE    = "bento/ubuntu-24.04"
@@ -28,6 +29,7 @@ NOEUDS << { "nom" => "bdd2", "ip" => "#{RESEAU}.32", "mem" => 768, "role" => "re
 end
 NOEUDS << { "nom" => "lb1", "ip" => "#{RESEAU}.11", "mem" => 512, "role" => "lb" }
 NOEUDS << { "nom" => "lb2", "ip" => "#{RESEAU}.12", "mem" => 512, "role" => "lb" } if AVEC_LB2
+NOEUDS << { "nom" => "obs", "ip" => "#{RESEAU}.41", "mem" => 768, "role" => "obs" } if AVEC_OBS
 
 # Chemin absolu : le fichier atterrit toujours dans config/ à la racine,
 # même si vagrant est lancé depuis un sous-dossier
@@ -59,6 +61,7 @@ Vagrant.configure("2") do |config|
       )
       m.vm.provision "shell", path: "scripts/common.sh", env: env
       # lb : "always" pour régénérer HAProxy à chaque démarrage
+      m.vm.provision "shell", path: "scripts/node_exporter.sh", env: env if AVEC_OBS
       m.vm.provision "shell", path: "scripts/#{n['role']}.sh", env: env,
                      run: (n["role"] == "lb" ? "always" : "once")
     end

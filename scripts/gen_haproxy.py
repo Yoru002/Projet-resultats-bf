@@ -20,6 +20,11 @@ frontend web
     bind *:80
     default_backend apps
 
+frontend metrics
+    bind *:8404
+    http-request use-service prometheus-exporter if { path /metrics }
+    no log
+
 backend apps
     balance roundrobin
     option httpchk
