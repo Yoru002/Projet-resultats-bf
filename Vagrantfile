@@ -4,8 +4,8 @@ require 'fileutils'
 
 GROUPE   = (ENV['GROUPE'] || 4).to_i
 NB_APP   = (ENV['NB_APP'] || 2).to_i
-AVEC_LB2 = ENV['LB2'] != '0'            # extension E1 : active par défaut, LB2=0 pour l'éteindre
-AVEC_OBS = ENV['OBS'] != '0'            # extension E2 : active par défaut, OBS=0 pour l'éteindre
+AVEC_LB2 = ENV['LB2'] == '1'            # extension E1 : LB2=1 pour l'activer
+AVEC_OBS = ENV['OBS'] == '1'            # extension E2 : OBS=1 pour l'activer
 RESEAU   = "192.168.#{55 + GROUPE}"
 VIP      = "#{RESEAU}.5"
 BOITE    = "bento/ubuntu-24.04"
