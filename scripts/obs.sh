@@ -2,7 +2,16 @@
 set -euo pipefail
 source /vagrant/scripts/lib.sh
 export DEBIAN_FRONTEND=noninteractive
-apt-get install -y -qq prometheus gnupg curl
+
+reessayer() {  # reessayer COMMANDE... : 5 tentatives
+  for essai in 1 2 3 4 5; do
+    "$@" && return 0
+    echo "echec ($essai/5) : $*"; sleep 10
+  done
+  return 1
+}
+
+reessayer apt-get install -y -qq prometheus gnupg curl
 
 # --- Prometheus : cibles generees depuis noeuds.yml ---
 python3 /vagrant/scripts/gen_prometheus.py > /tmp/prometheus.yml
@@ -12,15 +21,16 @@ fi
 systemctl enable prometheus >/dev/null 2>&1
 
 # --- Grafana : depot officiel ---
-if [ ! -f /etc/apt/keyrings/grafana.gpg ]; then
-  install -d -m 0755 /etc/apt/keyrings
-  curl -fsSL https://apt.grafana.com/gpg.key | gpg --dearmor --yes -o /etc/apt/keyrings/grafana.gpg
+install -d -m 0755 /etc/apt/keyrings
+if [ ! -s /etc/apt/keyrings/grafana.gpg ]; then
+  reessayer bash -c 'set -o pipefail; curl -fsSL https://apt.grafana.com/gpg.key | gpg --dearmor --yes -o /tmp/grafana.gpg'
+  install -m 0644 /tmp/grafana.gpg /etc/apt/keyrings/grafana.gpg
 fi
 echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" > /tmp/grafana.list
 if install_si_different /tmp/grafana.list /etc/apt/sources.list.d/grafana.list; then
-  apt-get update -qq
+  reessayer apt-get update -qq
 fi
-apt-get install -y -qq grafana
+reessayer apt-get install -y -qq grafana
 
 # --- Grafana : configuration par fichiers du depot ---
 install -d /etc/grafana/provisioning/datasources /etc/grafana/provisioning/dashboards /var/lib/grafana/dashboards
