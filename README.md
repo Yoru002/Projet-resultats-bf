@@ -432,7 +432,7 @@ vagrant up app1 --no-provision
 | N° | Exigence | Comment elle est tenue | Vérification |
 |---|---|---|---|
 | **R1** | Reconstruction intégrale sans geste manuel | tout est dans le Vagrantfile et `scripts/` ; aucune étape après `vagrant up` | `bash scripts/mesure_v5.sh` |
-| **R2** | Idempotence | fichiers réécrits et services redémarrés seulement si le contenu change (`install_si_different`) ; ajouts gardés par `grep -qxF` | voir ci-dessous |
+| **R2** | Idempotence | fichiers réécrits et services redémarrés seulement si le contenu change (`install_si_different`) ; ajouts gardés par `grep -qxF` | `bash scripts/verif_r2.sh` (voir ci-dessous) |
 | **R3** | Nombre de serveurs applicatifs paramétrable | `NB_APP` ; `gen_haproxy.py` lit `noeuds.yml` ; aucune IP d'application en dur | `NB_APP=4 vagrant up` puis V1 |
 | **R4** | Sonde de santé, serveur défaillant écarté en moins de 5 s | `GET /sante` toutes les secondes, 2 échecs pour écarter (2 à 3 s) | V2 |
 | **R5** | bdd2 est une réplique en flux de bdd1 | `pg_basebackup -R` puis réplication en flux | voir ci-dessous |
@@ -440,7 +440,7 @@ vagrant up app1 --no-provision
 | **R7** | Aucun secret dans le dépôt | `.env` ignoré, `.env.exemple` factice | voir ci-dessous |
 | **R8** | Trafic interne sur le réseau privé, un seul port exposé | une seule redirection de port (lb1, 8080 → 80) ; `pg_hba.conf` restreint | voir ci-dessous |
 
-**R2 — rejouer deux fois et comparer :**
+**R2 — rejouer deux fois et comparer.** `bash scripts/verif_r2.sh` le fait sur toutes les VM démarrées : empreinte md5 des fichiers écrits par le provisionnement, PID des services et nombre de lignes de `resultats`, puis deux `vagrant provision` et comparaison. Résultat dans `docs/mesures/r2-idempotence.txt`. Le script refuse de tourner si `NB_APP` ne correspond pas à HAProxy ou si une bascule a eu lieu (il abîmerait la plateforme). À la main :
 
 ```bash
 vagrant ssh lb1 -c "sudo md5sum /etc/haproxy/haproxy.cfg /etc/keepalived/keepalived.conf"
@@ -482,9 +482,9 @@ Les résultats bruts sont enregistrés dans `docs/mesures/`. Chaque scénario se
 
 | N° | Scénario | Commande | Mesure à relever |
 |---|---|---|---|
-| **V1** | Répartition de 20 appels à `/info` | voir ci-dessous | écart entre le serveur le plus et le moins sollicité (cible < 20 %) |
+| **V1** | Répartition de 20 appels à `/info` | `bash scripts/mesure_v1.sh` (écrit `v1-n<N>.txt`) | écart entre le serveur le plus et le moins sollicité (cible < 20 %) |
 | **V2** | Panne d'un serveur applicatif | voir ci-dessous | requêtes perdues, durée de la période dégradée (cible < 5 s) |
-| **V3** | Montée en charge, N=2 puis N=4 | `ab -n 2000 -c 50 "http://localhost:8080/resultat?matricule=BF000042"` | requêtes par seconde dans chaque configuration |
+| **V3** | Montée en charge, N=2 puis N=4 | `bash scripts/mesure_v3.sh` (`ab -n 2000 -c 50`, 3 essais par N) | requêtes par seconde dans chaque configuration |
 | **V4** | Panne de la base primaire | `bash scripts/mesure_v4.sh` | 503 propre, durée de la bascule |
 | **V5** | Reconstruction complète | `bash scripts/mesure_v5.sh` | durée totale |
 | **V6** | Panne du répartiteur (E1) | `bash scripts/mesure_v6.sh` (ou `... brutal`) | requêtes perdues, durée de la coupure |
@@ -508,7 +508,7 @@ done | tee docs/mesures/v2-panne-app.txt
 
 Compter les lignes différentes de `200` et la durée entre la première et la dernière.
 
-**V3** : relever « Requests per second » avec `NB_APP=2`, puis `bash scripts/scale.sh 4` et recommencer. Faire plusieurs essais par configuration et garder la médiane. Lancer `ab` depuis le **poste hôte**, jamais depuis une VM (il consommerait le processeur partagé et fausserait la mesure).
+**V3** : `bash scripts/mesure_v3.sh` part du socle avec `NB_APP=2` et enchaîne seul : 3 essais `ab -n 2000 -c 50`, passage à 4 serveurs (`scripts/scale.sh 4`), attente que les 4 soient dans la rotation, répartition de 20 appels à `/info` (V1 pour N=4), 3 nouveaux essais. Il garde la médiane de chaque configuration et enregistre les sorties brutes de `ab` dans `docs/mesures/v3-charge.txt`. Éteindre les extensions pendant la mesure, et lancer `ab` depuis le **poste hôte**, jamais depuis une VM (il consommerait le processeur partagé et fausserait la mesure). La plateforme reste ensuite à 4 serveurs (retrait : [§6.1](#61-ajouter-ou-retirer-des-serveurs-applicatifs)).
 
 **V4, V5, V6** : les scripts enregistrent leur résultat dans `docs/mesures/` (`v4-application-final.txt`, `v5-reconstruction.txt`, `v6-vrrp.txt`). `mesure_v5.sh` **détruit toutes les machines** et demande confirmation (option `-y` pour l'éviter). `mesure_v6.sh` laisse lb1 arrêtée : la relancer avec `vagrant up lb1` avant un nouvel essai.
 
@@ -557,7 +557,8 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 │   ├── gen_prometheus.py    # génère prometheus.yml depuis noeuds.yml
 │   ├── bascule.sh           # promotion de bdd2 et reconfiguration des applications
 │   ├── scale.sh             # change le nombre de serveurs applicatifs
-│   └── mesure_v4.sh, mesure_v5.sh, mesure_v6.sh   # scénarios V4, V5, V6
+│   ├── mesure_v1.sh … mesure_v6.sh   # scénarios V1 à V6 (résultats dans docs/mesures/)
+│   └── verif_r2.sh          # preuve de l'idempotence (R2)
 └── docs/
     ├── guide-donnees.md     # guide pas à pas de la partie données (D1 à D4)
     ├── journal-donnees.md   # journal de bord de la partie données
