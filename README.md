@@ -432,7 +432,7 @@ vagrant up app1 --no-provision
 | N° | Exigence | Comment elle est tenue | Vérification |
 |---|---|---|---|
 | **R1** | Reconstruction intégrale sans geste manuel | tout est dans le Vagrantfile et `scripts/` ; aucune étape après `vagrant up` | `bash scripts/mesure_v5.sh` |
-| **R2** | Idempotence | fichiers réécrits et services redémarrés seulement si le contenu change (`install_si_different`) ; ajouts gardés par `grep -qxF` | voir ci-dessous |
+| **R2** | Idempotence | fichiers réécrits et services redémarrés seulement si le contenu change (`install_si_different`) ; ajouts gardés par `grep -qxF` | `bash scripts/verif_r2.sh` (voir ci-dessous) |
 | **R3** | Nombre de serveurs applicatifs paramétrable | `NB_APP` ; `gen_haproxy.py` lit `noeuds.yml` ; aucune IP d'application en dur | `NB_APP=4 vagrant up` puis V1 |
 | **R4** | Sonde de santé, serveur défaillant écarté en moins de 5 s | `GET /sante` toutes les secondes, 2 échecs pour écarter (2 à 3 s) | V2 |
 | **R5** | bdd2 est une réplique en flux de bdd1 | `pg_basebackup -R` puis réplication en flux | voir ci-dessous |
@@ -440,7 +440,7 @@ vagrant up app1 --no-provision
 | **R7** | Aucun secret dans le dépôt | `.env` ignoré, `.env.exemple` factice | voir ci-dessous |
 | **R8** | Trafic interne sur le réseau privé, un seul port exposé | une seule redirection de port (lb1, 8080 → 80) ; `pg_hba.conf` restreint | voir ci-dessous |
 
-**R2 — rejouer deux fois et comparer :**
+**R2 — rejouer deux fois et comparer.** `bash scripts/verif_r2.sh` le fait sur toutes les VM démarrées : empreinte md5 des fichiers écrits par le provisionnement, PID des services et nombre de lignes de `resultats`, puis deux `vagrant provision` et comparaison. Résultat dans `docs/mesures/r2-idempotence.txt`. Le script refuse de tourner si `NB_APP` ne correspond pas à HAProxy ou si une bascule a eu lieu (il abîmerait la plateforme). À la main :
 
 ```bash
 vagrant ssh lb1 -c "sudo md5sum /etc/haproxy/haproxy.cfg /etc/keepalived/keepalived.conf"
@@ -557,7 +557,8 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 │   ├── gen_prometheus.py    # génère prometheus.yml depuis noeuds.yml
 │   ├── bascule.sh           # promotion de bdd2 et reconfiguration des applications
 │   ├── scale.sh             # change le nombre de serveurs applicatifs
-│   └── mesure_v4.sh, mesure_v5.sh, mesure_v6.sh   # scénarios V4, V5, V6
+│   ├── mesure_v1.sh … mesure_v6.sh   # scénarios V1 à V6 (résultats dans docs/mesures/)
+│   └── verif_r2.sh          # preuve de l'idempotence (R2)
 └── docs/
     ├── guide-donnees.md     # guide pas à pas de la partie données (D1 à D4)
     ├── journal-donnees.md   # journal de bord de la partie données
