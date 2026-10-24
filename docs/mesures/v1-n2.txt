@@ -1,18 +1,51 @@
-=== Essai 1 - Sun Oct 11 19:59:04     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
-=== Essai 2 - Sun Oct 11 20:01:47     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
-=== Essai 3 - Sun Oct 11 20:01:59     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
-=== Essai 1 - Sun Oct 11 20:17:43     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
-=== Essai 1 - Sun Oct 11 20:17:55     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
-=== Essai 1 - Sun Oct 11 20:18:05     2026 ===
-     10 {"host": "app1"}
-     10 {"host": "app2"}
+=== V1 - Test de répartition (round-robin) - Sat Oct 24 18:29:47     2026 ===
+Configuration : NB_APP=2 serveurs applicatifs
+Plateforme : HAProxy round-robin
+
+Serveurs applicatifs détectés : 2 (app1
+app2)
+
+Lancement de 20 requêtes /info...
+
+  Requête 1 : app1
+  Requête 2 : app2
+  Requête 3 : app1
+  Requête 4 : app2
+  Requête 5 : app1
+  Requête 6 : app2
+  Requête 7 : app1
+  Requête 8 : app2
+  Requête 9 : app1
+  Requête 10 : app2
+  Requête 11 : app1
+  Requête 12 : app2
+  Requête 13 : app1
+  Requête 14 : app2
+  Requête 15 : app1
+  Requête 16 : app2
+  Requête 17 : app1
+  Requête 18 : app2
+  Requête 19 : app1
+  Requête 20 : app2
+
+=== Résultats ===
+Total des requêtes : 20
+
+Répartition :
+  app1       :  10 requêtes (50.0%)
+  app2       :  10 requêtes (50.0%)
+
+=== Analyse ===
+Serveur le plus sollicité : app1 (10 requêtes)
+Serveur le moins sollicité : app1 (10 requêtes)
+
+Écart relatif : (10 - 10) / 20 = 0.0 %
+Seuil de conformité : < 20 %
+
+✅ CONFORME : écart de 0.0 % (< 20 %)
+Le round-robin fonctionne correctement.
+
+=== Conclusion ===
+Résultat : CONFORME
+
+✅ Test V1 réussi — Répartition équitable
