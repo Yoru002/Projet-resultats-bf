@@ -13,7 +13,12 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-SORTIE="docs/mesures/v1-n2.txt"
+# Obtenir la liste des serveurs applicatifs depuis noeuds.yml
+APPS=$(awk '/- "?nom"?: app/{print $NF}' config/noeuds.yml | tr -d '"')
+NB_APPS=$(echo "$APPS" | wc -w | tr -d " ")
+
+# Un fichier par configuration : la mesure N=4 ne remplace plus celle de N=2
+SORTIE="docs/mesures/v1-n${NB_APPS}.txt"
 mkdir -p docs/mesures
 TMP_BUFFER=$(mktemp)
 
@@ -23,10 +28,6 @@ if ! curl -fsS --max-time 5 http://localhost:8080/sante >/dev/null 2>&1; then
   echo "Vérifiez : vagrant up && vagrant provision lb1"
   exit 1
 fi
-
-# Obtenir la liste des serveurs applicatifs depuis noeuds.yml
-APPS=$(awk '/- "?nom"?: app/{print $NF}' config/noeuds.yml | tr -d '"')
-NB_APPS=$(echo "$APPS" | wc -w)
 
 # Lancer 20 requêtes /info pour observer la répartition
 declare -A COMPTEURS

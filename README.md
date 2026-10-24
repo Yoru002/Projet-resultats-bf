@@ -482,7 +482,7 @@ Les résultats bruts sont enregistrés dans `docs/mesures/`. Chaque scénario se
 
 | N° | Scénario | Commande | Mesure à relever |
 |---|---|---|---|
-| **V1** | Répartition de 20 appels à `/info` | voir ci-dessous | écart entre le serveur le plus et le moins sollicité (cible < 20 %) |
+| **V1** | Répartition de 20 appels à `/info` | `bash scripts/mesure_v1.sh` (écrit `v1-n<N>.txt`) | écart entre le serveur le plus et le moins sollicité (cible < 20 %) |
 | **V2** | Panne d'un serveur applicatif | voir ci-dessous | requêtes perdues, durée de la période dégradée (cible < 5 s) |
 | **V3** | Montée en charge, N=2 puis N=4 | `bash scripts/mesure_v3.sh` (`ab -n 2000 -c 50`, 3 essais par N) | requêtes par seconde dans chaque configuration |
 | **V4** | Panne de la base primaire | `bash scripts/mesure_v4.sh` | 503 propre, durée de la bascule |
