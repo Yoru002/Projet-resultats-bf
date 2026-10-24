@@ -8,6 +8,8 @@ cd /tmp
 : "${NODE_IP:?NODE_IP manquant}"
 : "${REPLICA_IP:?REPLICA_IP manquant}"
 
+. /vagrant/scripts/lib.sh
+
 RESEAU_CIDR="${NODE_IP%.*}.0/24"
 
 apt-get update -qq
@@ -16,19 +18,24 @@ apt-get install -y -qq --no-upgrade postgresql
 VERSION_PG=$(ls /usr/lib/postgresql | sort -V | tail -1)
 CONF=/etc/postgresql/${VERSION_PG}/main
 
-# Écouter sur toutes les interfaces (piège n°1) : fichier réécrit => idempotent
-cat > ${CONF}/conf.d/resultats.conf <<EOF
+# Écouter sur toutes les interfaces (piège n°1). CHANGED=1 seulement si la
+# configuration a réellement changé : un rejeu ne redémarre pas la base (R2)
+CHANGED=0
+cat > /tmp/resultats-pg.conf <<EOF
 listen_addresses = '*'
 EOF
+if install_si_different /tmp/resultats-pg.conf "${CONF}/conf.d/resultats.conf" 644; then CHANGED=1; fi
 
 # Règles d'accès, ajoutées une seule fois chacune
 ajouter_regle() {
-  grep -qxF "$1" ${CONF}/pg_hba.conf || echo "$1" >> ${CONF}/pg_hba.conf
+  grep -qxF "$1" "${CONF}/pg_hba.conf" || { echo "$1" >> "${CONF}/pg_hba.conf"; CHANGED=1; }
 }
 ajouter_regle "host resultats   appuser    ${RESEAU_CIDR}     scram-sha-256"
 ajouter_regle "host replication replicator ${REPLICA_IP}/32   scram-sha-256"
 
-systemctl restart postgresql
+if [ "${CHANGED}" = 1 ] || ! systemctl is-active --quiet "postgresql@${VERSION_PG}-main"; then
+  systemctl restart postgresql
+fi
 
 # Utilisateurs : l'application (lecture) et la réplication
 sudo -u postgres psql -v ON_ERROR_STOP=1 -v mdp="$DB_PASSWORD" -v rmdp="$REPL_PASSWORD" <<'SQL'
