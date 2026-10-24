@@ -21,8 +21,14 @@ install -d -m 755 /opt/resultats
 
 # Environnement du service : le mot de passe ne passe que par /etc/default,
 # jamais dans le dépôt (R7) ni dans la ligne de commande (ps visible)
+#
+# Choix C (ordre primaire d'abord) : DB_HOST commence par la PRIMAIRE pour
+# éviter que chaque requête tente d'abord la réplique (lecture seule) :
+# mesuré à ~86 req/s avec l'ordre réplique,primaire contre ~156 req/s ici.
+# Après une panne de bdd1, scripts/bascule.sh réécrit cet ordre côté app et
+# redémarre le service (voir étape 5/5 de bascule.sh).
 cat > /tmp/resultats.env <<EOF
-DB_HOST=${REPLICA_IP},${PRIMARY_IP}
+DB_HOST=${PRIMARY_IP},${REPLICA_IP}
 DB_TARGET=read-write
 DB_TIMEOUT=2
 DB_PORT=5432
