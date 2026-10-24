@@ -1,0 +1,82 @@
+=== V2 panne serveur applicatif - Sat Oct 24 19:09:05     2026 ===
+Configuration : NB_APP=2
+Service testé : http://localhost:8080/resultat?matricule=BF000042
+
+Serveurs applicatifs détectés : app1 app2
+
+Cible de la panne : app1 (192.168.59.21)
+
+Lecture de /sante avant la panne :
+{"ok": true, "host": "app1"}
+HTTP 200 en 0.029548s
+
+Arrêt de app1 (192.168.59.21)...
+  app1 arrêté en 1s
+
+
+Lecture de /sante après la panne :
+{"ok": true, "host": "app2"}
+HTTP 200 en 0.030395s
+
+Première requête non 200 à : 1792869051005 ms
+Dernière  requête non 200 à : 1792869053435 ms
+Durée de dégradation estimée : 2.53 s (~2530 ms)
+
+--- Résultat V2 ---
+Requêtes totales  : 152
+Requêtes en échec : 2
+Cible de la panne : app1 (192.168.59.21)
+App1 en service   : true
+
+CONFORME : ≤ 3 requêtes perdues et dégradation < 5 s
+
+Résultat V2 : CONFORME
+
+================================================================
+DOCUMENTATION DU SCÉNARIO V2
+================================================================
+
+Objectif (cahier des charges)
+  Simuler la panne brutale d'un serveur applicatif pendant une charge et
+  vérifier que la plateforme continue de servir les clients avec :
+    - ≤ 3 requêtes perdues (ERREURS_MAX=3)
+    - une période de dégradation < 5 s (DUREE_MAX_SEC=5)
+
+Déroulé du test (exécution réelle du 24/10/2026 19:09)
+  1. Vérification préalable : app1 répond sur son IP privée (192.168.59.21:3000)
+  2. Sonde continue : curl /resultat?matricule=BF000042 via HAProxy (localhost:8080),
+     toutes les 100 ms, horodatage ms
+  3. État avant panne : /sante -> HTTP 200 (host: app1, 0.030 s)
+  4. Panne simulée : vagrant halt app1 --force (arrêt immédiat = panne matérielle),
+     VM poweroff confirmée en 1 s
+  5. Observation pendant 20 s pendant laquelle HAProxy doit retirer app1
+     (sonde /sante du backend) et router vers app2
+  6. État après panne : /sante -> HTTP 200 (host: app2, 0.030 s)
+
+Résultats mesurés
+  - Requêtes totales pendant le test : 152
+  - Requêtes en échec (non 200)      : 2
+  - Durée de dégradation              : 2.53 s (première erreur -> dernière erreur)
+  - Cible de la panne                : app1 (192.168.59.21)
+  - Reprise confirmée                : /sante répond 200 depuis app2 après panne
+
+Conformité
+  - Seuil requêtes perdues (≤ 3) : 2 perdues      -> OK
+  - Seuil dégradation (< 5 s)    : 2.53 s          -> OK
+  - VERDICT : CONFORME
+
+Analyse
+  Les 2 requêtes perdues correspondent à la fenêtre de détection de la panne
+  par HAProxy (sonde tcp-check /sante du backend app1) : entre l'arrêt brut de
+  la VM et le passage de app1 en état DOWN, les requêtes routées vers app1
+  échouent. La bascule vers app2 est ensuite immédiate, sans redémarrage ni
+  intervention humaine. La durée mesurée (2.53 s) est inférieure au seuil de
+  5 s du cahier des charges.
+
+Reproductibilité
+  Commande : NB_APP=2 bash scripts/mesure_v2.sh
+  Prérequis : vagrant up (5 VM) + vagrant provision lb1
+  Reset : le script laisse app1 arrêtée (fin de scénario de panne) ; remise en
+  service par : vagrant up app1 (effectuée après cette exécution).
+  Bug corrigé avant cette mesure : variable awk DUREE_MAX_SEC non passée avec
+  -v (comparaison toujours fausse -> verdict NON CONFORME erroné).
