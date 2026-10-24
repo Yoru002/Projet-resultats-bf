@@ -4,7 +4,8 @@ require 'fileutils'
 
 GROUPE   = (ENV['GROUPE'] || 4).to_i
 NB_APP   = (ENV['NB_APP'] || 2).to_i
-AVEC_LB2 = ENV['LB2'] != '0'            # extension E1 : active par défaut, LB2=0 pour l'éteindre
+AVEC_LB2 = ENV['LB2'] == '1'            # extension E1 : LB2=1 pour l'activer
+AVEC_OBS = ENV['OBS'] == '1'            # extension E2 : OBS=1 pour l'activer
 RESEAU   = "192.168.#{55 + GROUPE}"
 VIP      = "#{RESEAU}.5"
 BOITE    = "bento/ubuntu-24.04"
@@ -28,6 +29,7 @@ NOEUDS << { "nom" => "bdd2", "ip" => "#{RESEAU}.32", "mem" => 768, "role" => "re
 end
 NOEUDS << { "nom" => "lb1", "ip" => "#{RESEAU}.11", "mem" => 512, "role" => "lb" }
 NOEUDS << { "nom" => "lb2", "ip" => "#{RESEAU}.12", "mem" => 512, "role" => "lb" } if AVEC_LB2
+NOEUDS << { "nom" => "obs", "ip" => "#{RESEAU}.41", "mem" => 768, "role" => "obs" } if AVEC_OBS
 
 # Chemin absolu : le fichier atterrit toujours dans config/ à la racine,
 # même si vagrant est lancé depuis un sous-dossier

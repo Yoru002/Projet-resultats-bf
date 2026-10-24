@@ -9,7 +9,7 @@ SORTIE="docs/mesures/v5-reconstruction.txt"
 mkdir -p docs/mesures
 
 if [ "${1:-}" != "-y" ]; then
-  read -r -p "Detruit toutes les VM puis reconstruit (15 a 30 min). Continuer ? [o/N] " rep
+  read -r -p "Detruit toutes les VM puis reconstruit. Continuer ? [o/N] " rep
   [ "$rep" = "o" ] || { echo "Annule."; exit 1; }
 fi
 

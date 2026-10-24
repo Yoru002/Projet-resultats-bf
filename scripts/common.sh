@@ -17,4 +17,7 @@ for essai in 1 2 3 4 5; do
   if [ "$essai" = 5 ]; then exit 1; fi
 done
 
-apt-get install -y -qq python3-yaml
+# Un seul apt-get install groupé : outils communs + node_exporter (prêt pour E2)
+apt-get install -y -qq python3-yaml prometheus-node-exporter
+systemctl enable --now prometheus-node-exporter >/dev/null 2>&1
+systemctl is-active --quiet prometheus-node-exporter
