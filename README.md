@@ -484,7 +484,7 @@ Les résultats bruts sont enregistrés dans `docs/mesures/`. Chaque scénario se
 |---|---|---|---|
 | **V1** | Répartition de 20 appels à `/info` | voir ci-dessous | écart entre le serveur le plus et le moins sollicité (cible < 20 %) |
 | **V2** | Panne d'un serveur applicatif | voir ci-dessous | requêtes perdues, durée de la période dégradée (cible < 5 s) |
-| **V3** | Montée en charge, N=2 puis N=4 | `ab -n 2000 -c 50 "http://localhost:8080/resultat?matricule=BF000042"` | requêtes par seconde dans chaque configuration |
+| **V3** | Montée en charge, N=2 puis N=4 | `bash scripts/mesure_v3.sh` (`ab -n 2000 -c 50`, 3 essais par N) | requêtes par seconde dans chaque configuration |
 | **V4** | Panne de la base primaire | `bash scripts/mesure_v4.sh` | 503 propre, durée de la bascule |
 | **V5** | Reconstruction complète | `bash scripts/mesure_v5.sh` | durée totale |
 | **V6** | Panne du répartiteur (E1) | `bash scripts/mesure_v6.sh` (ou `... brutal`) | requêtes perdues, durée de la coupure |
@@ -508,7 +508,7 @@ done | tee docs/mesures/v2-panne-app.txt
 
 Compter les lignes différentes de `200` et la durée entre la première et la dernière.
 
-**V3** : relever « Requests per second » avec `NB_APP=2`, puis `bash scripts/scale.sh 4` et recommencer. Faire plusieurs essais par configuration et garder la médiane. Lancer `ab` depuis le **poste hôte**, jamais depuis une VM (il consommerait le processeur partagé et fausserait la mesure).
+**V3** : `bash scripts/mesure_v3.sh` part du socle avec `NB_APP=2` et enchaîne seul : 3 essais `ab -n 2000 -c 50`, passage à 4 serveurs (`scripts/scale.sh 4`), attente que les 4 soient dans la rotation, répartition de 20 appels à `/info` (V1 pour N=4), 3 nouveaux essais. Il garde la médiane de chaque configuration et enregistre les sorties brutes de `ab` dans `docs/mesures/v3-charge.txt`. Éteindre les extensions pendant la mesure, et lancer `ab` depuis le **poste hôte**, jamais depuis une VM (il consommerait le processeur partagé et fausserait la mesure). La plateforme reste ensuite à 4 serveurs (retrait : [§6.1](#61-ajouter-ou-retirer-des-serveurs-applicatifs)).
 
 **V4, V5, V6** : les scripts enregistrent leur résultat dans `docs/mesures/` (`v4-application-final.txt`, `v5-reconstruction.txt`, `v6-vrrp.txt`). `mesure_v5.sh` **détruit toutes les machines** et demande confirmation (option `-y` pour l'éviter). `mesure_v6.sh` laisse lb1 arrêtée : la relancer avec `vagrant up lb1` avant un nouvel essai.
 
