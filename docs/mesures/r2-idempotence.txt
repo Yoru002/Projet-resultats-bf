@@ -1,0 +1,38 @@
+=== R2 idempotence - Sun Oct 25 13:53:52     2026 ===
+Commande : vagrant provision, deux fois de suite (toutes les VM démarrées)
+Version du dépôt testée : c565d76 (branche main)
+VM vérifiées : bdd1 bdd2 app1 app2 lb1 
+NB_APP=2 LB2=0 OBS=0 ; durée totale : 240 s
+Code de sortie : rejeu 1 = 0, rejeu 2 = 0
+
+--- Empreintes après le rejeu 2 (fichiers écrits par le provisionnement) ---
+bdd1 fichier /etc/apt/apt.conf.d/99-projet 2bd0300411a711454ad87be9946e917f
+bdd1 fichier /etc/postgresql/16/main/conf.d/resultats.conf 80d81d5cf053e39e85fcbec50f031919
+bdd1 fichier /etc/postgresql/16/main/pg_hba.conf 2e5defb422396a17dc60e1dd9669dda4
+bdd1 donnees resultats 50000
+bdd2 fichier /etc/apt/apt.conf.d/99-projet 2bd0300411a711454ad87be9946e917f
+bdd2 fichier /etc/postgresql/16/main/conf.d/resultats.conf e1124031a97edd7282ee1395340fb9af
+bdd2 fichier /etc/postgresql/16/main/pg_hba.conf fe5c8db62281b41c0088161458daa2d7
+bdd2 fichier /var/lib/postgresql/.pgpass ebd9da5d6450c677798c4c3933264df5
+bdd2 fichier /var/lib/postgresql/16/main/postgresql.auto.conf d17705ed27c7c0fb90e57f80b16afb12
+app1 fichier /etc/apt/apt.conf.d/99-projet 2bd0300411a711454ad87be9946e917f
+app1 fichier /etc/default/resultats 8c1751f8cd123f11d0bbc45349c27152
+app1 fichier /etc/systemd/system/resultats.service cb34c609e969c87d293256c27c206237
+app1 fichier /opt/resultats/serveur.py c8b46aad8e4b271ae1ded69a583f4c47
+app2 fichier /etc/apt/apt.conf.d/99-projet 2bd0300411a711454ad87be9946e917f
+app2 fichier /etc/default/resultats 8c1751f8cd123f11d0bbc45349c27152
+app2 fichier /etc/systemd/system/resultats.service cb34c609e969c87d293256c27c206237
+app2 fichier /opt/resultats/serveur.py c8b46aad8e4b271ae1ded69a583f4c47
+lb1 fichier /etc/apt/apt.conf.d/99-projet 2bd0300411a711454ad87be9946e917f
+lb1 fichier /etc/haproxy/haproxy.cfg 0387cb0ad9289f363f03d21244463dda
+lb1 fichier /etc/keepalived/keepalived.conf d53d2c75d0a3537a986c2ce4291080e3
+
+--- Comparaison rejeu 1 -> rejeu 2 ---
+Fichiers modifiés : aucun
+Données modifiées : aucune
+Services redémarrés (PID changé) : aucun
+
+--- Pour information : état initial -> rejeu 1 ---
+Aucun fichier modifié par le rejeu 1.
+
+RESULTAT R2 : CONFORME (deux rejeux sans échec, aucun fichier ni donnée modifié)
