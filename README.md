@@ -1,8 +1,8 @@
-# RÉSULTATS-BF — Infrastructure résiliente et scalable avec Vagrant
+# RÉSULTATS-BF : infrastructure résiliente et scalable avec Vagrant
 
-> Projet de groupe — Master 1 Informatique, IBAM (Université Joseph Ki-Zerbo)
-> Module **DevOps et infrastructures reproductibles** — enseignant : Dr SOMDA Flavien Hervé
-> Année universitaire 2026 — 2027
+> Projet de groupe, Master 1 Informatique, IBAM (Université Joseph Ki-Zerbo)
+> Module **DevOps et infrastructures reproductibles**, enseignant : Dr SOMDA Flavien Hervé
+> Année universitaire 2026-2027
 
 RÉSULTATS-BF est une plateforme de consultation de résultats d'examens : un candidat saisit son matricule et obtient son résultat. L'application est volontairement minuscule (moins de 150 lignes de Python). **Ce qui compte, c'est l'infrastructure autour d'elle**, entièrement décrite en code, reconstructible en une commande, et qui continue de fonctionner quand une machine tombe.
 
@@ -87,7 +87,7 @@ vagrant up
 | [Vagrant](https://developer.hashicorp.com/vagrant) | 2.4.9 ou plus (2.3.x est incompatible avec VirtualBox 7.1 et 7.2) | décrit et construit les machines |
 | Git | récent | récupérer le dépôt |
 | curl | récent | tests |
-| Apache Bench (`ab`) | facultatif | mesures de charge (V3) — à installer **sur le poste hôte**, pas dans les VM |
+| Apache Bench (`ab`) | facultatif | mesures de charge (V3), à installer **sur le poste hôte**, pas dans les VM |
 
 **Matériel** : 8 Go de mémoire minimum (le socle seul utilise environ 3 Go pour les machines virtuelles) et environ 10 Go d'espace disque. Fermer les applications lourdes avant de reconstruire la plateforme : une mémoire saturée ralentit les VM et fausse les mesures.
 
@@ -111,24 +111,24 @@ sudo modprobe vboxnetflt
 ```
                         Poste hôte
                   (navigateur, curl, ab)
-                           │  localhost:8080   ← seul port exposé (R8)
+                           │  localhost:8080   <- seul port exposé (R8)
                            ▼
    ┌──────────────── Réseau privé 192.168.59.0/24 ─────────────────┐
    │                                                                │
    │        IP virtuelle .5 (VRRP / keepalived)                     │
    │              │                                                 │
    │   ┌──────────┴──────────┐                                      │
-   │   │ lb1 (.11) HAProxy   │  lb2 (.12) passif — extension E1     │
+   │   │ lb1 (.11) HAProxy   │  lb2 (.12) passif - extension E1     │
    │   └──────────┬──────────┘                                      │
-   │              │ HTTP :3000 — sonde GET /sante                   │
-   │     ┌────────┼────────┬─ … ─┐   N serveurs applicatifs         │
-   │     ▼        ▼        ▼     ▼   (N paramétrable, N ≥ 2)        │
-   │   app1 (.21) app2 (.22) app3 … appN (.2N)                      │
+   │              │ HTTP :3000 - sonde GET /sante                   │
+   │     ┌────────┼────────┬─...─┐   N serveurs applicatifs         │
+   │     ▼        ▼        ▼     ▼   (N paramétrable, N >= 2)       │
+   │   app1 (.21) app2 (.22) app3...appN (.2N)                      │
    │              │ SQL :5432                                       │
    │              ▼                                                 │
    │   bdd1 (.31) primaire ── réplication en flux ──▶ bdd2 (.32)    │
    │                                                                │
-   │   obs (.41) Prometheus + Grafana — extension E2                │
+   │   obs (.41) Prometheus + Grafana - extension E2                │
    └────────────────────────────────────────────────────────────────┘
 ```
 
@@ -140,7 +140,7 @@ Les adresses ci-dessus sont celles du **groupe réseau n° 4**. Elles suivent la
 |---|---|---|---|---|
 | `bdd1` | base PostgreSQL primaire (lecture et écriture) | `.31` | 768 Mo | socle |
 | `bdd2` | réplique en flux, promouvable | `.32` | 768 Mo | socle |
-| `app1` … `appN` | serveurs applicatifs sans état (N ≥ 2) | `.21` … `.2N` | 512 Mo | socle |
+| `app1` à `appN` | serveurs applicatifs sans état (au moins 2) | `.21` à `.2N` | 512 Mo | socle |
 | `lb1` | répartiteur de charge actif (HAProxy), maître de la VIP | `.11` | 512 Mo | socle |
 | `lb2` | répartiteur passif, reprend l'IP virtuelle `.5` | `.12` | 512 Mo | extension E1 |
 | `obs` | supervision : Prometheus et Grafana | `.41` | 768 Mo | extension E2 |
@@ -151,7 +151,7 @@ Le socle (5 machines) représente environ **3 Go** ; avec E1 et E2, environ **4,
 
 | Port | Où | Usage |
 |---|---|---|
-| `8080` (hôte) → `80` (lb1) | poste hôte | **seul port exposé vers l'hôte** |
+| `8080` (hôte) vers `80` (lb1) | poste hôte | **seul port exposé vers l'hôte** |
 | `80` | lb1, lb2 | HAProxy |
 | `3000` | serveurs applicatifs | service HTTP |
 | `5432` | bdd1, bdd2 | PostgreSQL |
@@ -308,7 +308,7 @@ Le script déroule cinq étapes et s'arrête à la première qui échoue :
 | Étape | Contrôle ou action |
 |---|---|
 | 1/5 | bdd2 est démarrée |
-| 2/5 | bdd1 est injoignable — sinon `REFUS : bdd1 repond encore`, pour éviter deux primaires |
+| 2/5 | bdd1 est injoignable, sinon `REFUS : bdd1 repond encore`, pour éviter deux primaires |
 | 3/5 | bdd2 est bien une réplique (`pg_is_in_recovery()` vaut `t`) |
 | 4/5 | promotion de bdd2 (`pg_promote`), puis vérification que `pg_is_in_recovery()` vaut `f` |
 | 5/5 | sur chaque serveur applicatif (liste lue dans `noeuds.yml`) : réécriture de `DB_HOST` avec bdd2 en premier, redémarrage du service `resultats`, vérification de `/info` |
@@ -369,7 +369,7 @@ vagrant ssh bdd1 -c "sudo tail -30 /var/log/postgresql/*.log"            # Postg
 
 Le sujet demande au moins deux extensions. Deux sont réalisées.
 
-### 7.1 E1 — Répartiteur redondant (keepalived et IP virtuelle)
+### 7.1 E1 : répartiteur redondant (keepalived et IP virtuelle)
 
 lb1 et lb2 exécutent HAProxy avec la **même configuration** générée. keepalived leur fait partager l'adresse virtuelle `192.168.59.5` par le protocole VRRP.
 
@@ -378,7 +378,7 @@ lb1 et lb2 exécutent HAProxy avec la **même configuration** générée. keepal
 | lb1 | maître, priorité 150 |
 | lb2 | secours, priorité 100 |
 | Surveillance | `pgrep haproxy` toutes les secondes : si HAProxy meurt, la VIP passe à l'autre répartiteur |
-| Annonces VRRP | 1 par seconde → reprise en environ 3 s lors d'une panne brutale |
+| Annonces VRRP | 1 par seconde, donc une reprise en environ 3 s lors d'une panne brutale |
 | Identifiant VRRP | `50 + GROUPE` (54 pour le groupe 4) |
 | Authentification | `VRRP_PASS` (fichier `.env`) |
 
@@ -393,7 +393,7 @@ curl http://192.168.59.5/info                          # répond toujours, via l
 
 Si la VIP est injoignable depuis le poste hôte, activer le mode promiscuité de la carte privée des répartiteurs dans le Vagrantfile (`vb.customize ["modifyvm", :id, "--nicpromisc2", "allow-all"]`), puis `vagrant reload lb1 lb2`.
 
-### 7.2 E2 — Observabilité (Prometheus, node_exporter, Grafana)
+### 7.2 E2 : observabilité (Prometheus, node_exporter, Grafana)
 
 | Brique | Où | Rôle |
 |---|---|---|
@@ -438,9 +438,9 @@ vagrant up app1 --no-provision
 | **R5** | bdd2 est une réplique en flux de bdd1 | `pg_basebackup -R` puis réplication en flux | voir ci-dessous |
 | **R6** | Procédure de bascule écrite, exécutable, chronométrée | `scripts/bascule.sh` | V4 (`scripts/mesure_v4.sh`) |
 | **R7** | Aucun secret dans le dépôt | `.env` ignoré, `.env.exemple` factice | voir ci-dessous |
-| **R8** | Trafic interne sur le réseau privé, un seul port exposé | une seule redirection de port (lb1, 8080 → 80) ; `pg_hba.conf` restreint | voir ci-dessous |
+| **R8** | Trafic interne sur le réseau privé, un seul port exposé | une seule redirection de port (lb1, 8080 vers 80) ; `pg_hba.conf` restreint | voir ci-dessous |
 
-**R2 — rejouer deux fois et comparer.** `bash scripts/verif_r2.sh` le fait sur toutes les VM démarrées : empreinte md5 des fichiers écrits par le provisionnement, PID des services et nombre de lignes de `resultats`, puis deux `vagrant provision` et comparaison. Résultat dans `docs/mesures/r2-idempotence.txt`. Le script refuse de tourner si `NB_APP` ne correspond pas à HAProxy ou si une bascule a eu lieu (il abîmerait la plateforme). À la main :
+**R2 : rejouer deux fois et comparer.** `bash scripts/verif_r2.sh` le fait sur toutes les VM démarrées : empreinte md5 des fichiers écrits par le provisionnement, PID des services et nombre de lignes de `resultats`, puis deux `vagrant provision` et comparaison. Résultat dans `docs/mesures/r2-idempotence.txt`. Le script refuse de tourner si `NB_APP` ne correspond pas à HAProxy ou si une bascule a eu lieu (il abîmerait la plateforme). À la main :
 
 ```bash
 vagrant ssh lb1 -c "sudo md5sum /etc/haproxy/haproxy.cfg /etc/keepalived/keepalived.conf"
@@ -451,7 +451,7 @@ vagrant ssh bdd1 -c "sudo -u postgres psql -d resultats -tAc 'SELECT count(*) FR
 vagrant ssh bdd1 -c "grep -c replicator /etc/postgresql/16/main/pg_hba.conf"                     # 1 : pas de doublon
 ```
 
-**R5 — écrire sur bdd1, lire sur bdd2 :**
+**R5 : écrire sur bdd1, lire sur bdd2.**
 
 ```bash
 vagrant ssh bdd1 -c "sudo -u postgres psql -d resultats -c \"INSERT INTO resultats VALUES ('TEST000001','Test R5','A',12.50,true)\""
@@ -461,14 +461,14 @@ vagrant ssh bdd1 -c "sudo -u postgres psql -d resultats -c \"DELETE FROM resulta
 vagrant ssh bdd1 -c "sudo -u postgres psql -c 'SELECT client_addr, state FROM pg_stat_replication'"                    # streaming
 ```
 
-**R7 — rien de sensible dans l'historique :**
+**R7 : rien de sensible dans l'historique.**
 
 ```bash
 git ls-files | grep -E '^\.env$'                       # ne doit rien afficher
 git log --all -p | grep -E '^\+.*(PASSWORD|VRRP_PASS)='   # uniquement des valeurs factices ou des références ${...}
 ```
 
-**R8 — un seul port exposé :**
+**R8 : un seul port exposé.**
 
 ```bash
 grep -n forwarded_port Vagrantfile                     # une seule ligne (lb1)
@@ -495,7 +495,7 @@ Les résultats bruts sont enregistrés dans `docs/mesures/`. Chaque scénario se
 for i in $(seq 20); do curl -s http://localhost:8080/info; echo; done | sort | uniq -c
 ```
 
-L'écart se calcule ainsi : (appels du serveur le plus sollicité − appels du moins sollicité) / 20.
+L'écart se calcule ainsi : (appels du serveur le plus sollicité - appels du moins sollicité) / 20.
 
 **V2** : lancer cette boucle, puis `vagrant halt app1` dans un second terminal.
 
@@ -517,6 +517,7 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | Scénario | Résultat | Fichier |
 |---|---|---|
 | **V1** (N=2) | app1 10, app2 10 sur 20 appels, écart de 0 % | `v1-n2.txt` |
+ Mesure/v3-pool-connexions
 | **V2** — panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
 | **V4** — bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
 | **V4** — avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
@@ -527,6 +528,15 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | **R2** — idempotence | deux `vagrant provision` successifs : codes de sortie 0, aucun fichier ni donnée modifié, aucun service redémarré (240 s) | `r2-idempotence.txt` |
 | **V3** — montée en charge | médiane **124,8 req/s** à N=2 et **135,0 req/s** à N=4 (rapport ×1,08), **0 échec** sur 6 000 requêtes par configuration, 95 % sous 674 ms puis 399 ms | `v3-charge.txt` |
 | V3 — même mesure avant le pool de connexions | 79,3 req/s à N=2 et 47,7 req/s à N=4 (rapport ×0,60), 60 à 87 % de réponses 503 : la sonde `/sante` ouvrait une connexion PostgreSQL par passage et sortait au-delà du timeout de HAProxy | commit `7964eec` |
+=======
+| **V2**, panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
+| **V4**, bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
+| **V4**, avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
+| **V5**, reconstruction du socle | 18 min 26 s (mesure du 24/10) ; plateforme fonctionnelle, `RESULTAT : OK` | `v5-reconstruction.txt` |
+| **V6**, arrêt propre de lb1 | 1 requête perdue sur 253 (environ 200 ms) | `v6-vrrp.txt` |
+| **V6**, arrêt brutal de lb1 | 3 requêtes perdues (environ 2,9 s) puis 2 requêtes perdues (environ 1,5 s) | `v6-vrrp.txt` |
+| **R5**, réplication | ligne écrite sur bdd1, lue sur bdd2 | `r5-replication.txt` |
+ main
 | Ordre des bases (avant V3) | environ 86 req/s avec la réplique en premier, environ 156 req/s avec la primaire d'abord (mesure unique) | `docs/journal-donnees.md` |
 
 **En cours** : V1 avec N=4, et une nouvelle mesure de V4 et V6 avec la version actuelle des scripts (la bascule compte désormais 5 étapes, keepalived fait partie du socle).
@@ -563,12 +573,11 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 │   ├── gen_prometheus.py    # génère prometheus.yml depuis noeuds.yml
 │   ├── bascule.sh           # promotion de bdd2 et reconfiguration des applications
 │   ├── scale.sh             # change le nombre de serveurs applicatifs
-│   ├── mesure_v1.sh … mesure_v6.sh   # scénarios V1 à V6 (résultats dans docs/mesures/)
+│   ├── mesure_v1.sh à mesure_v6.sh   # scénarios V1 à V6 (résultats dans docs/mesures/)
 │   └── verif_r2.sh          # preuve de l'idempotence (R2)
 └── docs/
     ├── guide-donnees.md     # guide pas à pas de la partie données (D1 à D4)
     ├── journal-donnees.md   # journal de bord de la partie données
-    ├── journal-de-bord.md   # journal de bord commun (livrable L3)
     └── mesures/             # résultats bruts des mesures
 ```
 
@@ -591,7 +600,7 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | `E: Failed to fetch ... Hash Sum mismatch` pendant `apt-get update` | miroir ou proxy qui sert des fichiers incohérents | rien à faire si le script réessaie ; sinon `vagrant provision <machine>` ou changer de connexion |
 | `curl: (7) Failed to connect ... port 3000` dans la sortie du provisionnement d'un serveur applicatif | essai de la boucle de vérification avant que le service écoute | **sans gravité** : la ligne suivante `app provisionne, ecoute sur 0.0.0.0:3000` confirme le démarrage |
 | Avertissement *guest additions do not match* | version des additions invités différente de VirtualBox | sans gravité tant que `/vagrant` est monté |
-| `vagrant status` ne liste pas `lb2`, `obs` ou `app3` | variable non exportée dans ce terminal | `export NB_APP=… LB2=1 OBS=1` |
+| `vagrant status` ne liste pas `lb2`, `obs` ou `app3` | variable non exportée dans ce terminal | `export NB_APP=4 LB2=1 OBS=1` |
 | `/sante` répond `503` | la base est injoignable | `vagrant status`, puis `vagrant ssh app1 -c "sudo cat /etc/default/resultats"` (`DB_HOST` doit contenir les deux bases) |
 | `Empty reply from server` sur le port 8080 | HAProxy absent ou arrêté | `vagrant ssh lb1 -c "systemctl is-active haproxy"` puis `vagrant provision lb1` |
 | Toujours le même serveur dans `/info` avec un navigateur | le navigateur réutilise sa connexion | vérifier avec `curl` (nouvelle connexion à chaque appel) |
@@ -639,6 +648,6 @@ Le fichier `.mailmap` regroupe les identités Git de chaque membre : `git shortl
 - Chaque fichier a un propriétaire ; les contributions hors de son domaine sont tracées dans l'historique Git (rotation).
 - Rituel hebdomadaire : `vagrant destroy -f` puis `vagrant up` sur le poste d'un autre membre, pour découvrir les gestes manuels oubliés.
 
-**Documents du groupe** : `docs/journal-de-bord.md` (journal de bord commun : rôles, chronologie, décisions, difficultés), `docs/guide-donnees.md` (guide pas à pas de la partie données), `docs/journal-donnees.md` (décisions, difficultés et mesures de la partie données).
+**Documents du groupe** : `docs/guide-donnees.md` (guide pas à pas de la partie données), `docs/journal-donnees.md` (décisions, difficultés et mesures de la partie données).
 
 **Livrables du projet** : dépôt Git (ce dépôt), dossier d'architecture, journal de bord, démonstration de 20 minutes (destruction puis reconstruction en direct, puis trois scénarios tirés au sort).

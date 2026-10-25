@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Service applicatif RESULTATS-BF — sans état (rôle : ingénieur applicatif).
+"""Service applicatif RESULTATS-BF, sans état (rôle : ingénieur applicatif).
 
 Points d'entrée :
   GET /info                   nom d'hôte du serveur qui a répondu (V1)

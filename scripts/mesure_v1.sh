@@ -98,16 +98,16 @@ if [ "$TOTAL" -gt 0 ] && [ "$MAX" -gt 0 ]; then
   echo ""
   
   if [ "$(awk -v e="$ECART" 'BEGIN{print (e < 20) ? "oui" : "non"}')" = "oui" ]; then
-    echo "✅ CONFORME : écart de $ECART % (< 20 %)"
+    echo "CONFORME : écart de $ECART % (< 20 %)"
     echo "Le round-robin fonctionne correctement."
     RESULTAT=CONFORME
   else
-    echo "❌ NON CONFORME : écart de $ECART % (≥ 20 %)"
+    echo "NON CONFORME : écart de $ECART % (>= 20 %)"
     echo "La répartition n'est pas équitable."
     RESULTAT=NON_CONFORME
   fi
 else
-  echo "⚠️  ERREUR : impossible de calculer l'écart (TOTAL=$TOTAL, MAX=$MAX)"
+  echo "ERREUR : impossible de calculer l'écart (TOTAL=$TOTAL, MAX=$MAX)"
   RESULTAT=ERREUR
 fi
 
@@ -117,10 +117,10 @@ echo "Résultat : $RESULTAT"
 
 if [ "$RESULTAT" = "CONFORME" ]; then
   echo ""
-  echo "✅ Test V1 réussi — Répartition équitable"
+  echo "Test V1 réussi : répartition équitable"
 elif [ "$RESULTAT" = "NON_CONFORME" ]; then
   echo ""
-  echo "❌ Test V1 échoué — Répartition inégale"
+  echo "Test V1 échoué : répartition inégale"
   echo "  Vérifiez :"
   echo "    - HAProxy est bien configuré (backend apps)"
   echo "    - Tous les serveurs sont UP (systemctl is-active resultats)"

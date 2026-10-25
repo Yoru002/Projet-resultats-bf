@@ -50,7 +50,7 @@ CHANGED=0
 if install_si_different /tmp/resultats.env /etc/default/resultats 600; then CHANGED=1; fi
 
 # Unité systemd : Restart=on-failure, mais jamais au démarrage d'une base
-# absente — l'application doit simplement démarrer et répondre 503 sur /sante
+# absente : l'application doit simplement démarrer et répondre 503 sur /sante
 cat > /tmp/resultats.service <<'EOF'
 [Unit]
 Description=Service applicatif RESULTATS-BF (sans etat)
