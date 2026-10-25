@@ -1,6 +1,6 @@
 # Journal de bord — RÉSULTATS-BF
 
-Mis à jour le 24 octobre 2026 · rédaction : malickabdoul, à relire par le groupe
+Mis à jour le 25 octobre 2026 · rédaction : Malick (`malickabdoul`), à relire par le groupe
 
 ## Rôles
 
@@ -10,11 +10,10 @@ Chaque membre tient un domaine, et chacun a aussi contribué hors du sien, comme
 | --- | --- | --- |
 | William OUOBA (`Yoru002`, `William`) | Architecte réseau et répartition | dépôt et Vagrantfile, répartiteur HAProxy généré depuis `noeuds.yml`, E1 (keepalived), E2 (Prometheus, Grafana), `scale.sh`, mesures V1, V5 et V6, README ; relecture et fusion des pull requests |
 | Pégué Judicaël OUÉDRAOGO (`pegueo2000`) | Ingénieur données | PostgreSQL et jeu de 50 000 lignes, réplication, bascule chronométrée, mesures V4 et R5, guide et journal de la partie données ; hors domaine : connexion de l'application à deux bases, correctif de `HEAD /sante` |
-| `Fatahou980` | Ingénieur essais et observabilité | mesures V1 et V2 avec documentation, fusion des premières pull requests |
-| `TESTEUR04` | Ingénieur applicatif | service applicatif sans état et son provisionnement ; hors domaine : bascule avec reconfiguration des serveurs (choix C) |
-| `malickabdoul` | Suivi et coordination (mesures, livrables) | scripts V3 (montée en charge N=2 puis N=4) et R2 (preuve d'idempotence), correctif de `mesure_v1.sh` (PR #18) ; correctif de la recopie de bdd2 après bascule (PR #19) ; dossier d'architecture ; mesures sur un 4e poste |
+| Fatahou (`Fatahou980`, `TESTEUR04`) | Ingénieur applicatif | service applicatif sans état et son provisionnement ; hors domaine : bascule avec reconfiguration des serveurs (choix C), mesures V1 et V2 avec documentation |
+| Malick (`malickabdoul`, `KAM`) | Ingénieur essais et observabilité | scripts V3 (montée en charge N=2 puis N=4) et R2 (preuve d'idempotence), correctif de `mesure_v1.sh` (PR #18), dossier d'architecture, journal de bord ; hors domaine : correctif de la recopie de bdd2 après bascule (PR #19), mise à jour du README |
 
-- [ ] Question ouverte : `TESTEUR04` et `Fatahou980` sont-ils la même personne ? Le README les présente comme deux membres ; à préciser par le groupe avant le rendu.
+Fatahou a travaillé sur deux machines, d'où ses deux identités Git ; le fichier `.mailmap` du dépôt les regroupe, comme celles des autres membres.
 
 ## Chronologie
 
@@ -22,14 +21,14 @@ Le socle a fonctionné de bout en bout dès le 11/10 ; la fin du projet porte su
 
 | Date | Étape | Qui |
 | --- | --- | --- |
-| 24/10 | PR #19 ouverte : bdd2 n'est plus recopiée après une bascule | malickabdoul |
-| 24/10 | PR #18 : scripts V3 et R2, correctif de V1 | malickabdoul |
-| 24/10 | PR #17 : mesures V1 et V2 documentées | Fatahou980 |
+| 25/10 | PR #19 fusionnée : bdd2 n'est plus recopiée après une bascule | Malick, fusion Pégué |
+| 24/10 | PR #18 : scripts V3 et R2, correctif de V1 | Malick |
+| 24/10 | PR #17 : mesures V1 et V2 documentées | Fatahou |
 | 24/10 | PR #16 (E2) fusionnée, README complet, V5 refaite (18 min 26 s) | William |
 | 13/10 | PR #15 : `scale.sh` pour ajouter ou retirer des serveurs | William |
-| 12/10 | PR #14 : bascule qui reconfigure les serveurs (choix C) ; E2 développée | TESTEUR04, William |
+| 12/10 | PR #14 : bascule qui reconfigure les serveurs (choix C) ; E2 développée | Fatahou, William |
 | 11/10 | PR #9 à #13 : port 3000, répartiteur généré, E1 et V6, script V5, V1 avec N=2 | William |
-| 10/10 | PR #2 à #7 : service sans état, connexion aux deux bases, mesures V4, guide et journal données | TESTEUR04, Pégué |
+| 10/10 | PR #2 à #7 : service sans état, connexion aux deux bases, mesures V4, guide et journal données | Fatahou, Pégué |
 | 09/10 | PR #1 : réplication bdd2 et bascule chronométrée | Pégué |
 | 08/10 | Visio de lancement, dépôt initialisé, Vagrantfile, bdd1 | groupe, William, Pégué |
 | 05/10 | Lancement du projet dans le groupe | groupe |
@@ -72,4 +71,4 @@ La plupart des problèmes ont été trouvés en reconstruisant la plateforme sur
 | Après une bascule, `vagrant provision` effaçait bdd2 : la promotion supprime `standby.signal`, qui déclenchait une nouvelle copie | témoin de copie hors du répertoire de données (PR #19) ; vérifié sur un banc local, à valider sur les VM |
 | `/sante` en 503 passager après des reconstructions partielles | cause non établie ; la sonde de HAProxy absorbe ces écarts |
 
-- [ ] Reste à faire : un fichier `.mailmap` pour regrouper les différentes identités Git de chaque membre, comme le propose le journal de la partie données.
+- [x] Fichier `.mailmap` ajouté : il regroupe les identités Git de chaque membre (`git shortlog -sne` affiche une ligne par personne), comme le proposait le journal de la partie données.
