@@ -175,7 +175,7 @@ Tout le trafic entre machines circule sur le réseau privé. Vagrant ajoute en p
 
 **Connexion applicative à deux hôtes.** L'application reçoit `DB_HOST=<bdd1>,<bdd2>` avec `target_session_attrs=read-write` : la bibliothèque cliente ne retient que le serveur qui accepte les écritures. La primaire est placée **en premier** pour ne pas tenter à chaque requête une réplique qui refuse (mesuré : environ 156 req/s contre environ 86 req/s avec l'ordre inverse). Après une bascule, `bascule.sh` inverse cet ordre.
 
-**Provisionnement idempotent.** Chaque script génère sa configuration dans `/tmp`, puis appelle `install_si_different` (`scripts/lib.sh`) : le fichier n'est remplacé, et le service redémarré ou rechargé, que si le contenu a changé. Rejouer `vagrant provision` ne modifie donc rien (exceptions : voir [§12](#12-limites-connues)).
+**Provisionnement idempotent.** Chaque script génère sa configuration dans `/tmp`, puis appelle `install_si_different` (`scripts/lib.sh`) : le fichier n'est remplacé, et le service redémarré ou rechargé, que si le contenu a changé. Rejouer `vagrant provision` ne modifie donc rien et ne redémarre aucun service, bases de données comprises.
 
 **Aucun secret dans le dépôt.** Les mots de passe viennent du fichier `.env` (non versionné), lu par le Vagrantfile et transmis aux scripts sous forme de variables d'environnement. Dans les VM, ils ne sont écrits que dans des fichiers de droits `600`.
 
@@ -317,7 +317,7 @@ Il affiche en fin d'exécution `Duree totale de la bascule : X s` (environ 10 s 
 
 **Après une bascule**
 
-- **Ne pas redémarrer l'ancienne bdd1** (`vagrant up bdd1`) : elle se croirait toujours primaire et il y aurait deux bases qui divergent. Ne pas non plus rejouer `vagrant provision bdd2`, qui referait une copie depuis bdd1.
+- **Ne pas redémarrer l'ancienne bdd1** (`vagrant up bdd1`) : elle se croirait toujours primaire et il y aurait deux bases qui divergent. En revanche, rejouer `vagrant provision bdd2` est sans danger : `replique.sh` ne refait jamais la copie initiale sur une VM qui l'a déjà faite (marqueur `/var/lib/postgresql/.replique_initialisee`), ni sur une base qui contient déjà `resultats`.
 - La réintégration de l'ancien primaire comme réplique n'est pas automatisée : on reconstruit la paire.
 
 ```bash
@@ -604,8 +604,7 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 - **Réplication asynchrone.** En cas de panne brutale de bdd1, les toutes dernières écritures peuvent être perdues.
 - **Bascule manuelle.** Un outil comme Patroni, repmgr ou pg_auto_failover l'automatiserait ; ils demandent davantage de machines et de complexité.
 - **Risque de *split-brain* après bascule.** L'ancienne primaire ne doit pas redémarrer telle quelle ; sa réintégration comme réplique n'est pas automatisée (on reconstruit la paire).
-- **Rejeu de `bdd2` après une promotion.** `replique.sh` ne refait la copie initiale que si `standby.signal` est absent : après une promotion, ce fichier a disparu, donc un `vagrant provision bdd2` tenterait de refaire une copie depuis bdd1. Ne pas le faire après une bascule.
-- **Idempotence partielle sur les bases.** `bdd.sh` et `replique.sh` redémarrent PostgreSQL à chaque rejeu, même quand rien n'a changé (coupure brève du service).
+- **Copie initiale de bdd2 non rejouable automatiquement.** Pour refaire volontairement la copie depuis bdd1 (réplique abîmée), il faut supprimer `/var/lib/postgresql/.replique_initialisee` sur bdd2 avant `vagrant provision bdd2`, ou reconstruire la VM. C'est voulu : avant ce marqueur, un rejeu après une bascule effaçait la nouvelle primaire.
 - **Connexion à la base par requête.** C'est simple et garantit l'absence d'état, mais un pool de connexions (pgBouncer) améliorerait le débit.
 - **Latence après une panne de bdd1, avant la bascule.** Chaque requête attend environ 2 s (délai de connexion) tant que `bascule.sh` n'a pas été exécuté.
 - **Sonde stricte.** Avec un délai de 1 s par vérification, une charge forte sur un poste saturé peut faire écarter brièvement des serveurs sains ; ils reviennent seuls.
