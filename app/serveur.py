@@ -6,13 +6,19 @@ Points d'entrée :
   GET /sante                  200 si la base répond, 503 sinon (sonde HAProxy)
   GET /resultat?matricule=... résultat du candidat en JSON, lu dans PostgreSQL
 
-Sans état : connexion ouverte par requête, refermée aussitôt. La base peut
-être absente au démarrage : le service tourne et renvoie 503 (piège n°4).
-Écoute sur 0.0.0.0 et non 127.0.0.1 (piège n°1).
+Sans état : aucune session, aucun cache de résultat ; n'importe quel serveur
+peut prendre la suite d'un autre (V1, V2). Les connexions à PostgreSQL sont
+réutilisées via un pool borné (DB_POOL) : ouvrir une connexion authentifiée
+par requête saturait la base sous charge (50 requêtes concourantes : 1 à 2 s
+par connexion, sonde /sante au-delà du timeout de HAProxy, rafale de 503).
+La base peut être absente au démarrage : le service tourne et renvoie 503
+(piège n°4). Écoute sur 0.0.0.0 et non 127.0.0.1 (piège n°1).
 """
 import json
 import os
+import queue
 import socket
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 
@@ -29,15 +35,62 @@ DB = {
 }
 
 
-def requete(sql, params=()):
-    """Première ligne du résultat, ou None. Sans état : connexion par requête."""
-    cn = psycopg2.connect(**DB)          # échoue si la base est absente/injoignable
+TAILLE_POOL = int(os.environ.get("DB_POOL", "10"))
+ATTENTE_POOL = float(os.environ.get("DB_POOL_TIMEOUT", "0.5"))
+
+_libres = queue.Queue(maxsize=TAILLE_POOL)         # connexions disponibles
+_places = threading.BoundedSemaphore(TAILLE_POOL)  # connexions vivantes <= TAILLE
+
+
+class BaseIndisponible(Exception):
+    """Pool saturé : un 503 rapide vaut mieux qu'une file d'attente infinie."""
+
+
+def _connexion():
+    """Connexion du pool, ou une nouvelle si le pool n'est pas plein."""
     try:
-        with cn.cursor() as cur:
-            cur.execute(sql, params)
-            return cur.fetchone()
-    finally:
+        cn = _libres.get_nowait()
+        if not cn.closed:
+            return cn
+        _places.release()          # connexion périmée : la place est rendue
+    except queue.Empty:
+        pass
+    if not _places.acquire(timeout=ATTENTE_POOL):
+        raise BaseIndisponible("pool de connexions sature")
+    try:
+        return psycopg2.connect(**DB)   # échoue si la base est absente/injoignable
+    except BaseException:
+        _places.release()
+        raise
+
+
+def _rendre(cn):
+    _libres.put_nowait(cn)         # jamais plein : <= TAILLE connexions vivantes
+
+
+def _abandonner(cn):
+    try:
         cn.close()
+    finally:
+        _places.release()
+
+
+def requete(sql, params=()):
+    """Première ligne du résultat, ou None. Connexion empruntée puis rendue."""
+    for essai in (1, 2):           # 2e essai : élimine une connexion périmée (bascule)
+        cn = _connexion()
+        try:
+            with cn.cursor() as cur:
+                cur.execute(sql, params)
+                ligne = cur.fetchone()
+        except Exception:
+            _abandonner(cn)
+            if essai == 2:
+                raise
+            continue
+        _rendre(cn)
+        return ligne
+
 
 class Handler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"        # keep-alive : nécessaire pour les mesures ab
@@ -59,7 +112,8 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 requete("SELECT 1")
                 self._json(200, {"ok": True, "host": socket.gethostname()})
-            except Exception:
+            except Exception as exc:
+                self.log_error("sante : base injoignable (%s)", exc)
                 self._json(503, {"ok": False, "host": socket.gethostname()})
         elif url.path == "/resultat":
             self._resultat(parse_qs(url.query))
@@ -75,7 +129,8 @@ class Handler(BaseHTTPRequestHandler):
             ligne = requete(   # requête paramétrée : pas d'injection possible
                 "SELECT nom, serie, moyenne, admis FROM resultats WHERE matricule = %s",
                 (matricule,))
-        except Exception:
+        except Exception as exc:
+            self.log_error("resultat : base indisponible (%s)", exc)
             self._json(503, {"erreur": "base indisponible"})
             return
         if ligne is None:

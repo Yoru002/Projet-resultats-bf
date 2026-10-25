@@ -4,7 +4,7 @@
 > Module **DevOps et infrastructures reproductibles**, enseignant : Dr SOMDA Flavien Hervé
 > Année universitaire 2026-2027
 
-RÉSULTATS-BF est une plateforme de consultation de résultats d'examens : un candidat saisit son matricule et obtient son résultat. L'application est volontairement minuscule (moins de 100 lignes de Python). **Ce qui compte, c'est l'infrastructure autour d'elle**, entièrement décrite en code, reconstructible en une commande, et qui continue de fonctionner quand une machine tombe.
+RÉSULTATS-BF est une plateforme de consultation de résultats d'examens : un candidat saisit son matricule et obtient son résultat. L'application est volontairement minuscule (moins de 150 lignes de Python). **Ce qui compte, c'est l'infrastructure autour d'elle**, entièrement décrite en code, reconstructible en une commande, et qui continue de fonctionner quand une machine tombe.
 
 Deux exigences priment sur tout le reste :
 
@@ -517,6 +517,18 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | Scénario | Résultat | Fichier |
 |---|---|---|
 | **V1** (N=2) | app1 10, app2 10 sur 20 appels, écart de 0 % | `v1-n2.txt` |
+ Mesure/v3-pool-connexions
+| **V2** — panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
+| **V4** — bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
+| **V4** — avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
+| **V5** — reconstruction du socle | 18 min 26 s (mesure du 24/10) ; plateforme fonctionnelle, `RESULTAT : OK` | `v5-reconstruction.txt` |
+| **V6** — arrêt propre de lb1 | 1 requête perdue sur 253 (environ 200 ms) | `v6-vrrp.txt` |
+| **V6** — arrêt brutal de lb1 | 3 requêtes perdues (environ 2,9 s) puis 2 requêtes perdues (environ 1,5 s) | `v6-vrrp.txt` |
+| **R5** — réplication | ligne écrite sur bdd1, lue sur bdd2 | `r5-replication.txt` |
+| **R2** — idempotence | deux `vagrant provision` successifs : codes de sortie 0, aucun fichier ni donnée modifié, aucun service redémarré (240 s) | `r2-idempotence.txt` |
+| **V3** — montée en charge | médiane **124,8 req/s** à N=2 et **135,0 req/s** à N=4 (rapport ×1,08), **0 échec** sur 6 000 requêtes par configuration, 95 % sous 674 ms puis 399 ms | `v3-charge.txt` |
+| V3 — même mesure avant le pool de connexions | 79,3 req/s à N=2 et 47,7 req/s à N=4 (rapport ×0,60), 60 à 87 % de réponses 503 : la sonde `/sante` ouvrait une connexion PostgreSQL par passage et sortait au-delà du timeout de HAProxy | commit `7964eec` |
+=======
 | **V2**, panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
 | **V4**, bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
 | **V4**, avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
@@ -524,9 +536,10 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | **V6**, arrêt propre de lb1 | 1 requête perdue sur 253 (environ 200 ms) | `v6-vrrp.txt` |
 | **V6**, arrêt brutal de lb1 | 3 requêtes perdues (environ 2,9 s) puis 2 requêtes perdues (environ 1,5 s) | `v6-vrrp.txt` |
 | **R5**, réplication | ligne écrite sur bdd1, lue sur bdd2 | `r5-replication.txt` |
+ main
 | Ordre des bases (avant V3) | environ 86 req/s avec la réplique en premier, environ 156 req/s avec la primaire d'abord (mesure unique) | `docs/journal-donnees.md` |
 
-**En cours** : V3 (N=2 puis N=4, `scripts/mesure_v3.sh`), R2 (`scripts/verif_r2.sh`), V1 avec N=4, et une nouvelle mesure de V4 et V6 avec la version actuelle des scripts (la bascule compte désormais 5 étapes, keepalived fait partie du socle).
+**En cours** : V1 avec N=4, et une nouvelle mesure de V4 et V6 avec la version actuelle des scripts (la bascule compte désormais 5 étapes, keepalived fait partie du socle).
 
 > **Honnêteté des mesures.** Toutes les machines virtuelles se partagent le processeur et la mémoire d'un seul poste : doubler le nombre de serveurs applicatifs ne double pas le débit et peut même le réduire. Les durées de bascule incluent le délai de détection et les connexions `vagrant ssh`, pas seulement la promotion. Les mesures sont peu nombreuses et faites sur un poste de 8 Go.
 
@@ -608,9 +621,9 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 - **Bascule manuelle.** Un outil comme Patroni, repmgr ou pg_auto_failover l'automatiserait ; ils demandent davantage de machines et de complexité.
 - **Risque de *split-brain* après bascule.** L'ancienne primaire ne doit pas redémarrer telle quelle ; sa réintégration comme réplique n'est pas automatisée (on reconstruit la paire).
 - **Copie initiale de bdd2 non rejouable automatiquement.** Pour refaire volontairement la copie depuis bdd1 (réplique abîmée), il faut supprimer `/var/lib/postgresql/.replique_initialisee` sur bdd2 avant `vagrant provision bdd2`, ou reconstruire la VM. C'est voulu : avant ce marqueur, un rejeu après une bascule effaçait la nouvelle primaire.
-- **Connexion à la base par requête.** C'est simple et garantit l'absence d'état, mais un pool de connexions (pgBouncer) améliorerait le débit.
-- **Latence après une panne de bdd1, avant la bascule.** Chaque requête attend environ 2 s (délai de connexion) tant que `bascule.sh` n'a pas été exécuté.
-- **Sonde stricte.** Avec un délai de 1 s par vérification, une charge forte sur un poste saturé peut faire écarter brièvement des serveurs sains ; ils reviennent seuls.
+- **Pool de connexions applicatif, pas de mutualisation externe.** Chaque serveur applicatif garde au plus `DB_POOL` connexions (10 par défaut) : ouvrir une connexion authentifiée par requête saturait bdd1 dès 50 requêtes concourantes (mesure V3). Un pgBouncer devant PostgreSQL mutualiserait encore mieux, au prix d'une machine et d'un composant de plus.
+- **Latence après une panne de bdd1, avant la bascule.** Chaque requête échoue en environ 1 s (délai de connexion) tant que `bascule.sh` n'a pas été exécuté.
+- **Sonde stricte.** Deux vérifications manquées (`inter 1s fall 2`) suffisent à écarter un serveur ; le délai de 2 s laisse à `/sante` le temps de répondre un 503 franc plutôt que d'être coupée, mais une charge très forte peut encore écarter brièvement un serveur sain. Il revient seul.
 - **Sous-réseau du groupe.** Les réseaux hôte-seul sont propres à chaque poste, donc sans conflit entre groupes, sauf si deux groupes partagent la même machine (démonstration).
 - **Extensions E3 (Redis) et E4 (déploiement sans coupure)** : non réalisées.
 
