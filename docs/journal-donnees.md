@@ -17,8 +17,8 @@
 | Scripts idempotents (fichiers réécrits, ajouts gardés par `grep -qxF`, données insérées seulement si la table est vide, copie de la réplique gardée par `standby.signal`) | R2 : `vagrant provision` rejoué ne change rien (vérifié : `INSERT 0 0`, compte stable à 50 000) |
 | Le script de bascule refuse de promouvoir bdd2 si bdd1 répond encore | Éviter le « split-brain » : deux bases qui acceptent des écritures divergeraient |
 | Après une bascule, on reconstruit la paire au lieu de réintégrer l'ancien primaire | Simple et sûr ; limite connue, non automatisée |
-| L'application reçoit les deux adresses (bdd1 puis bdd2 — primaire d'abord) avec `target_session_attrs=read-write`, et `bascule.sh` réécrit `DB_HOST` + redémarre les apps après promotion | Débit mesuré ~156 req/s contre ~86 req/s avec l'ancien ordre (la réplique refusait chaque écriture) ; le coût de la bascule (2 s par requête tant que bdd1 tombe) est absorbé par la reconfiguration, qui reste indolore car l'application est sans état |
-| Numéro de groupe réseau : 4 | Le groupe 12 est ramené dans la plage 1 à 8 en recommençant la numérotation après 8 (12 − 8 = 4) ; décision du groupe |
+| L'application reçoit les deux adresses (bdd1 puis bdd2, primaire d'abord) avec `target_session_attrs=read-write`, et `bascule.sh` réécrit `DB_HOST` + redémarre les apps après promotion | Débit mesuré ~156 req/s contre ~86 req/s avec l'ancien ordre (la réplique refusait chaque écriture) ; le coût de la bascule (2 s par requête tant que bdd1 tombe) est absorbé par la reconfiguration, qui reste indolore car l'application est sans état |
+| Numéro de groupe réseau : 4 | Le groupe 12 est ramené dans la plage 1 à 8 en recommençant la numérotation après 8 (12 - 8 = 4) ; décision du groupe |
 
 ## Difficultés et résolution
 
@@ -28,7 +28,7 @@
    n'étaient pas chargés. Résolu par `modprobe`, rendu permanent dans `/etc/modules-load.d/`.
 3. **Plage d'adresses** : `192.168.67.11` (formule 55 + 12 pour le groupe 12) refusé par VirtualBox
    (plages autorisées : `192.168.56.0/21` et `fe80::/10`, aucun `networks.conf`). Mesuré sur le poste.
-   Décision du groupe : le numéro 12 est ramené dans la plage 1 à 8 en recommençant la numérotation après 8 (12 − 8 = 4). Le dépôt utilise donc `GROUPE=4` (192.168.59.x) par défaut.
+   Décision du groupe : le numéro 12 est ramené dans la plage 1 à 8 en recommençant la numérotation après 8 (12 - 8 = 4). Le dépôt utilise donc `GROUPE=4` (192.168.59.x) par défaut.
 4. **Après une bascule réussie, l'application restait en 503** : elle n'interrogeait que bdd1.
    Corrigé avec les deux adresses (voir ci-dessus).
 5. **Latence après bascule** : avec l'ordre bdd1,bdd2, `/sante` répondait en 2 à 3 s et le retour à 200 prenait 12,8 s.
@@ -44,11 +44,11 @@
 8. **`HEAD /sante` renvoyait toujours 200 sans interroger la base**, et le fichier `serveur.py` atteignait 100 lignes (consigne : moins de cent).
    Relevé en relisant le code. Correction proposée : `HEAD /sante` renvoie 404 (la sonde doit utiliser `GET /sante`), fichier ramené à 99 lignes (branche `app-corrections`).
 9. **Débit plafonné à ~86 req/s avec N=2 comme avec N=4** : `DB_HOST` commençait par
-   la réplique (bdd2), qui refuse chaque écriture — la tentative coûtait un aller-retour
+   la réplique (bdd2), qui refuse chaque écriture : la tentative coûtait un aller-retour
    à chaque requête. Ordre inversé mesuré : ~156 req/s. Choix C retenu : primaire
    d'abord (`app.sh`), et `bascule.sh` réécrit `DB_HOST` puis redémarre les apps après
    promotion. Conséquence : pendant la panne de bdd1 et avant la bascule, chaque requête
-   attend ~2 s (plancher `DB_TIMEOUT`) — à mesurer de nouveau (V3 et V4 à refaire).
+   attend ~2 s (plancher `DB_TIMEOUT`), à mesurer de nouveau (V3 et V4 à refaire).
 
 ## Mesures (résultats bruts dans `docs/mesures/`)
 
@@ -57,7 +57,7 @@
 | R5 : écriture sur bdd1, lecture sur bdd2, écriture refusée sur bdd2 | Conforme (`r5-replication.txt`) |
 | V4, durée de la bascule, trois essais | 9,7 s, 10,4 s, 10,0 s (moyenne 10,0 s) |
 | V4 avec l'application, retour à 200 | 9,7 s, bascule comprise (mesure faite avec l'ancien ordre bdd2,bdd1) |
-| V3 débit N=2 vs N=4 (ancien ordre) | ~86 req/s dans les deux cas — goulot : tentative de la réplique à chaque requête |
+| V3 débit N=2 vs N=4 (ancien ordre) | ~86 req/s dans les deux cas, goulot : tentative de la réplique à chaque requête |
 | V3 débit, ordre primaire d'abord | ~156 req/s (mesure unique, à refaire avec le choix C complet) |
 
 ## Limites
