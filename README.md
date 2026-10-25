@@ -562,6 +562,7 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 └── docs/
     ├── guide-donnees.md     # guide pas à pas de la partie données (D1 à D4)
     ├── journal-donnees.md   # journal de bord de la partie données
+    ├── journal-de-bord.md   # journal de bord commun (livrable L3)
     └── mesures/             # résultats bruts des mesures
 ```
 
@@ -631,6 +632,6 @@ Quatre rôles, un par membre. Chacun est responsable de son domaine, mais tous s
 - Chaque fichier a un propriétaire ; les contributions hors de son domaine sont tracées dans l'historique Git (rotation).
 - Rituel hebdomadaire : `vagrant destroy -f` puis `vagrant up` sur le poste d'un autre membre, pour découvrir les gestes manuels oubliés.
 
-**Documents du groupe** : `docs/guide-donnees.md` (guide pas à pas de la partie données), `docs/journal-donnees.md` (décisions, difficultés et mesures de la partie données).
+**Documents du groupe** : `docs/journal-de-bord.md` (journal de bord commun : rôles, chronologie, décisions, difficultés), `docs/guide-donnees.md` (guide pas à pas de la partie données), `docs/journal-donnees.md` (décisions, difficultés et mesures de la partie données).
 
 **Livrables du projet** : dépôt Git (ce dépôt), dossier d'architecture, journal de bord, démonstration de 20 minutes (destruction puis reconstruction en direct, puis trois scénarios tirés au sort).
