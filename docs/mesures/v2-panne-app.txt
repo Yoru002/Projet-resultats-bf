@@ -67,7 +67,7 @@ Conformité
 
 Analyse
   Les 2 requêtes perdues correspondent à la fenêtre de détection de la panne
-  par HAProxy (sonde tcp-check /sante du backend app1) : entre l'arrêt brut de
+  par HAProxy (sonde HTTP GET /sante du backend, option httpchk) : entre l'arrêt brut de
   la VM et le passage de app1 en état DOWN, les requêtes routées vers app1
   échouent. La bascule vers app2 est ensuite immédiate, sans redémarrage ni
   intervention humaine. La durée mesurée (2.53 s) est inférieure au seuil de
