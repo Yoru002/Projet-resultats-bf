@@ -12,7 +12,7 @@ defaults
     timeout connect 2s
     timeout client 30s
     timeout server 30s
-    timeout check 1s
+    timeout check 2s
     retries 2
     option redispatch
 
@@ -30,6 +30,10 @@ backend apps
     option httpchk
     http-check send meth GET uri /sante
     http-check expect status 200
+    # Budget de la sonde : 0,5 s d'attente du pool + 1 s de connexion = 1,5 s
+    # au pire ; 2 s laisse la marge nécessaire pour que /sante réponde 503
+    # franchement au lieu d'être coupée par le timeout (1 s écoulait des
+    # serveurs sains sous charge, voir V3).
     default-server inter 1s fall 2 rise 2
 """
 for n in apps:

@@ -27,10 +27,18 @@ install -d -m 755 /opt/resultats
 # mesuré à ~86 req/s avec l'ordre réplique,primaire contre ~156 req/s ici.
 # Après une panne de bdd1, scripts/bascule.sh réécrit cet ordre côté app et
 # redémarre le service (voir étape 5/5 de bascule.sh).
+#
+# Pool de connexions (V3) : ouvrir une connexion authentifiée par requête
+# saturait bdd1 sous charge (50 requêtes concourantes : 1 à 2 s par connexion,
+# /sante au-delà du timeout de HAProxy, rafale de 503). DB_POOL connexions au
+# plus par serveur applicatif : 4 serveurs x 10 = 40, loin du max_connections
+# de PostgreSQL (100). DB_POOL_TIMEOUT borne l'attente : au-delà, 503 rapide.
 cat > /tmp/resultats.env <<EOF
 DB_HOST=${PRIMARY_IP},${REPLICA_IP}
 DB_TARGET=read-write
-DB_TIMEOUT=2
+DB_TIMEOUT=1
+DB_POOL=10
+DB_POOL_TIMEOUT=0.5
 DB_PORT=5432
 DB_NAME=resultats
 DB_USER=appuser
