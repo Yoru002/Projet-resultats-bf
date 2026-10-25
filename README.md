@@ -619,15 +619,16 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 
 ## 13. Équipe et organisation
 
-Les quatre rôles du sujet, plus le suivi des mesures et des livrables. Chacun est responsable de son domaine, mais tous savent démontrer l'ensemble de la plateforme.
+Quatre rôles, un par membre. Chacun est responsable de son domaine, mais tous savent démontrer l'ensemble de la plateforme.
 
 | Membre | Rôle | Périmètre | Identités Git |
 |---|---|---|---|
 | William OUOBA | Architecte réseau et répartition | plan d'adressage, Vagrantfile, répartiteur, sonde de santé, E1, E2 | `Yoru002`, `William` |
 | Pégué Judicaël OUÉDRAOGO | Ingénieur données | PostgreSQL, jeu de données, réplication, procédure de bascule | `Pégué Judicaël Ouédraogo`, `pegueo2000` |
-| TESTEUR04 | Ingénieur applicatif | service HTTP, absence d'état, gestion des erreurs de base | `TESTEUR04` |
-| Fatahou980 | Ingénieur essais et observabilité | scénarios V1 à V6, campagne de mesures, rédaction des résultats | `Fatahou980` |
-| malickabdoul | Suivi et coordination | scripts V3 et R2, protection de la réplique après bascule, dossier d'architecture, journal de bord commun | `malickabdoul` |
+| Fatahou | Ingénieur applicatif | service HTTP, absence d'état, gestion des erreurs de base | `Fatahou980`, `TESTEUR04` |
+| Malick | Ingénieur essais et observabilité | scénarios V1 à V6, campagne de mesures, rédaction des résultats | `malickabdoul`, `KAM` |
+
+Le fichier `.mailmap` regroupe les identités Git de chaque membre : `git shortlog -sne` affiche une ligne par personne.
 
 **Organisation du travail**
 
