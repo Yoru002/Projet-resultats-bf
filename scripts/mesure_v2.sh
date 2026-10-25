@@ -65,7 +65,7 @@ if ! curl -fsS --max-time 8 "http://${IP_APP1}:3000/info" >/dev/null 2>&1; then
 
   # Vérifier quand même que l'app choisie répond avant de faire le test
   if ! curl -fsS --max-time 8 "http://${IP_CIBLE}:3000/info" >/dev/null 2>&1; then
-    echo "ERREUR : ni app1, ni app2 ne répondent — impossible de faire V2"
+    echo "ERREUR : ni app1, ni app2 ne répondent, impossible de faire V2"
     echo "Solutions :"
     echo "  1. relancer manuellement la VM (vagrant up app1 ; vagrant provision app1)"
     echo "  2. vérifier $ vagrant ssh app1 -c 'sudo systemctl status resultats'"
@@ -83,7 +83,7 @@ echo ""
 
 # Vérification finale de la cible avant de commencer
 if ! curl -fsS --max-time 8 "http://${IP_CIBLE}:3000/info" >/dev/null 2>&1; then
-  echo "ERREUR : la cible ${CIBLE} ne répond pas — abandon"
+  echo "ERREUR : la cible ${CIBLE} ne répond pas, abandon"
   exit 1
 fi
 
@@ -129,7 +129,7 @@ if [ "$SI_LEVE" = true ]; then
     echo "  (le test peut montrer quelques requêtes encore routées vers lui)"
   fi
 else
-  echo "  (la cible est déjà hors-service — aucun arrêt supplémentaire)"
+  echo "  (la cible est déjà hors service, aucun arrêt supplémentaire)"
 fi
 echo ""
 
@@ -181,7 +181,7 @@ echo ""
 # Phase 5 - décision de conformité
 # ----------------------------------------------------------------------
 if [ "$ERREURS" -le "$ERREURS_MAX" ] && [ "$(awk -v d="$DUREE_S" -v max="$DUREE_MAX_SEC" 'BEGIN { print (d < max) ? "oui" : "non" }')" = "oui" ]; then
-  echo "CONFORME : ≤ ${ERREURS_MAX} requêtes perdues et dégradation < ${DUREE_MAX_SEC} s"
+  echo "CONFORME : <= ${ERREURS_MAX} requêtes perdues et dégradation < ${DUREE_MAX_SEC} s"
   RESULTAT=CONFORME
 elif [ "$ERREURS" -eq 0 ]; then
   echo "CONFORME : aucune requête perdue (service continu immédiat)"

@@ -89,7 +89,7 @@ Panne réelle :
     vagrant halt bdd1
     ./scripts/bascule.sh
 
-Attendu : « [1/5] … [5/5] » puis « OK : bdd2 est maintenant la base primaire,
+Attendu : « [1/5] ... [5/5] » puis « OK : bdd2 est maintenant la base primaire,
 applications reconfigurees. » et une durée proche de 10 s (elle inclut le délai de
 détection, les connexions vagrant ssh et, depuis le choix C, la réécriture de
 `DB_HOST` + le redémarrage des serveurs applicatifs). L'étape 5/5 liste les
@@ -109,7 +109,7 @@ l'écriture. Mesuré : ~86 req/s avec l'ancien ordre (bdd2,bdd1) contre ~156
 req/s avec l'ordre primaire d'abord (bdd1,bdd2).
 
 Le prix de ce choix : si bdd1 tombe, chaque requête attend environ 2 s (le
-plancher de DB_TIMEOUT) avant de passer à bdd2, qui refuse encore — tant que la
+plancher de DB_TIMEOUT) avant de passer à bdd2, qui refuse encore, tant que la
 bascule n'a pas été faite. C'est `scripts/bascule.sh` qui résout cela : après la
 promotion de bdd2, il réécrit `DB_HOST` sur chaque serveur applicatif (bdd2
 primaire en premier) et redémarre le service ciblé. Le redémarrage est indolore
@@ -124,7 +124,7 @@ l'étape 4 affiche `DB_HOST=<bdd2>,<bdd1>` côté application (preuve du choix C
 Résultats enregistrés dans docs/mesures/v4-application-final.txt.
 
 À refaire après chaque `vagrant provision app1` : le provisionnement réécrit
-`DB_HOST` en ordre initial (bdd1,bdd2) — normal tant que bdd1 est vivante.
+`DB_HOST` en ordre initial (bdd1,bdd2), ce qui est normal tant que bdd1 est vivante.
 
 ### Arrêt puis redémarrage de toute la plateforme
 
@@ -135,7 +135,7 @@ de chaque VM conserve son état : `DB_HOST` garde l'ordre primaire d'abord, bdd2
 conserve `standby.signal` et reprend sa réplication, lb1 relance HAProxy (rôle
 `always`). Aucun provisionnement ne se rejoue (rôle `once`), donc rien ne bouge.
 - **Après une bascule** : ne faites PAS `vagrant up` sur bdd1. Elle se croirait
-encore primaire alors que bdd2 l'est déjà — deux primaires qui divergent
+encore primaire alors que bdd2 l'est déjà : deux primaires qui divergent
 (split-brain). Seule issue :
 
       vagrant destroy -f bdd1 bdd2
@@ -159,7 +159,7 @@ encore primaire alors que bdd2 l'est déjà — deux primaires qui divergent
 - Pourquoi le script de bascule refuse-t-il de promouvoir bdd1 vivante ? Split-brain.
 - Pourquoi l'ordre bdd1,bdd2 (primaire d'abord) plutôt que bdd2,bdd1 ? Débit :
   ~156 req/s contre ~86 req/s, car on ne tente plus d'abord une réplique qui
-  refuse l'écriture. Le coût — 2 s d'attente après panne de bdd1 — est pris en
+  refuse l'écriture. Le coût (2 s d'attente après panne de bdd1) est pris en
   charge par bascule.sh, qui réécrit l'ordre puis redémarre les apps.
 - Pourquoi redémarrer les apps lors de la bascule ? Pour prendre le nouvel ordre
   sans redéployer, l'application étant sans état le redémarrage est indolore.
