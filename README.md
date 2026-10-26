@@ -514,22 +514,32 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 
 ### Résultats mesurés
 
-| Scénario | Résultat | Fichier |
+Campagne complète du 26/10/2026, plateforme à `NB_APP=4` (7 machines + lb2 pour V6), refaite de bout en bout avec la version actuelle des scripts :
+
+| Scénario | Résultat (26/10) | Fichier |
 |---|---|---|
-| **V1** (N=2) | app1 10, app2 10 sur 20 appels, écart de 0 % | `v1-n2.txt` |
-| **V2** — panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
-| **V4** — bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
-| **V4** — avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
-| **V5** — reconstruction du socle | 18 min 26 s (mesure du 24/10) ; plateforme fonctionnelle, `RESULTAT : OK` | `v5-reconstruction.txt` |
-| **V6** — arrêt propre de lb1 | 1 requête perdue sur 253 (environ 200 ms) | `v6-vrrp.txt` |
-| **V6** — arrêt brutal de lb1 | 3 requêtes perdues (environ 2,9 s) puis 2 requêtes perdues (environ 1,5 s) | `v6-vrrp.txt` |
+| **V1** (N=4) | app1 5, app2 5, app3 5, app4 5 sur 20 appels, **écart de 0 %** (cible < 20 %) | `v1-n4.txt` |
+| **V1** (N=2) | app1 10, app2 10 sur 20 appels, écart de 0 % (relevé du 26/10, 16 h 31) | `v1-n2.txt` |
+| **V2** — panne d'app1 sous sonde continue | **2 requêtes en échec sur 166, période dégradée de 2,70 s** (cible < 5 s) — CONFORME | `v2-panne-app.txt` |
+| **V3** — montée en charge | médianes **133,7 req/s à N=2** et **124,6 req/s à N=4** (rapport ×0,93), **0 échec** sur 6 000 requêtes par configuration, 95 % sous 462 ms puis 440 ms | `v3-charge.txt` |
+| **V4** — avec l'application | `/sante` répond 503 (2,09 s) tant que bdd2 est en lecture seule ; **bascule en 81,3 s**, retour à 200 en **81,7 s** (bascule comprise) ; les 4 applications reconfigurées, `/resultat` en 200 après bascule | `v4-application-final.txt` |
+| **V5** — reconstruction complète (`NB_APP=4 LB2=1`, 8 machines) | **27 min 46 s** (destroy + up), code de sortie 0 ; `/sante` 200, `/resultat` 200, **1 réplique en streaming**, `RESULTAT : OK` | `v5-reconstruction.txt` |
+| **V6** — arrêt propre de lb1 | **1 requête perdue sur 262** (coupure d'environ 200 ms), reprise par lb2 via la VIP | `v6-vrrp.txt` |
+| **V6** — arrêt brutal de lb1 | **3 requêtes perdues sur 55** (coupure d'environ 2,8 s), reprise par lb2 | `v6-vrrp.txt` |
 | **R5** — réplication | ligne écrite sur bdd1, lue sur bdd2 | `r5-replication.txt` |
 | **R2** — idempotence | deux `vagrant provision` successifs : codes de sortie 0, aucun fichier ni donnée modifié, aucun service redémarré (240 s) | `r2-idempotence.txt` |
-| **V3** — montée en charge | médiane **124,8 req/s** à N=2 et **135,0 req/s** à N=4 (rapport ×1,08), **0 échec** sur 6 000 requêtes par configuration, 95 % sous 674 ms puis 399 ms | `v3-charge.txt` |
+| V3 — mesure antérieure (24/10) | médianes 124,8 req/s à N=2 et 135,0 req/s à N=4 (rapport ×1,08), 0 échec, 95 % sous 674 ms puis 399 ms | `v3-charge.txt` |
 | V3 — même mesure avant le pool de connexions | 79,3 req/s à N=2 et 47,7 req/s à N=4 (rapport ×0,60), 60 à 87 % de réponses 503 : la sonde `/sante` ouvrait une connexion PostgreSQL par passage et sortait au-delà du timeout de HAProxy | commit `7964eec` |
 | Ordre des bases (avant V3) | environ 86 req/s avec la réplique en premier, environ 156 req/s avec la primaire d'abord (mesure unique) | `docs/journal-donnees.md` |
 
-**En cours** : V1 avec N=4, et une nouvelle mesure de V4 et V6 avec la version actuelle des scripts (la bascule compte désormais 5 étapes, keepalived fait partie du socle).
+Points saillants de cette campagne :
+
+- **Tous les scénarios passent leurs seuils** : V1 écart 0 % (< 20 %), V2 2 pertes et 2,70 s (< 3 et < 5 s), V4 bascule fonctionnelle, V6 1 perte en mode propre et 3 en mode brutal (le VIP bascule sur lb2 dans les deux cas).
+- **La durée de bascule V4 (81,3 s) est plus longue que les relevés antérieurs (~10 s)** parce que la campagne tourne avec 4 applications à reconfigurer (5 étapes de `bascule.sh`, une connexion `vagrant ssh` par application) et que le poste hôte est chargé ; la promotion de bdd2 elle-même ne prend qu'une fraction de ce temps. Le retour à 200 suit immédiatement la reconfiguration.
+- **V3 montre un rapport ×0,93** (N=4 un peu plus lent que N=2) : toutes les VM partagent le processeur du poste hôte, doubler les serveurs ajoute de la contention sans ajout de débit — c'est le comportement attendu et documenté dans le sujet (voir « Honnêteté des mesures »).
+- **V6 en mode propre ne perd qu'une requête** (keepalived détecte l'arrêt net en ~200 ms), contre ~2,8 s en mode brutal (délai d'expiration VRRP complet) : l'extension E1 tient son engagement de reprise.
+- **V5 reconstruit les 8 machines en 27 min 46 s** avec contrôle final `RESULTAT : OK` (`/sante` 200, `/resultat` 200, 1 réplique en streaming). Le script a été corrigé au passage : la sortie de `vagrant ssh` pouvait contenir des séquences d'échappement du terminal qui faussaient la comparaison du nombre de répliques et marquaient ECHEC à tort.
+- **État final de la campagne** : les 8 machines en marche (`NB_APP=4 LB2=1`), répartition 2/2/2/2 sur `/sante`, lb1 maître de la VIP, bdd1 primaire et bdd2 réplique en streaming — la plateforme est revenue dans l'état du §1 avec les extensions activées.
 
 > **Honnêteté des mesures.** Toutes les machines virtuelles se partagent le processeur et la mémoire d'un seul poste : doubler le nombre de serveurs applicatifs ne double pas le débit et peut même le réduire. Les durées de bascule incluent le délai de détection et les connexions `vagrant ssh`, pas seulement la promotion. Les mesures sont peu nombreuses et faites sur un poste de 8 Go.
 

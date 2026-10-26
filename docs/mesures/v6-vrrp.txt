@@ -27,3 +27,45 @@ Mode : brutal
 Requetes totales : 53
 Requetes en echec : 2, coupure d environ 1546 ms
 Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Mon Oct 26 16:28:25     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 42
+Requetes en echec : 10, coupure d environ 12242 ms
+Derniere reponse : HTTP 000
+=== V6 panne de lb1 - Mon Oct 26 17:28:27     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 86
+Requetes en echec : 54, coupure d environ 70088 ms
+Derniere reponse : HTTP 000
+=== V6 panne de lb1 - Mon Oct 26 19:37:03     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 262
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Mon Oct 26 19:40:05     2026 ===
+VIP : 192.168.59.5
+Mode : brutal
+Requetes totales : 55
+Requetes en echec : 3, coupure d environ 2826 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Mon Oct 26 20:26:31     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 100
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Mon Oct 26 20:27:53     2026 ===
+VIP : 192.168.59.5
+Mode : brutal
+Requetes totales : 57
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200
+=== V6 panne de lb1 - Mon Oct 26 20:29:19     2026 ===
+VIP : 192.168.59.5
+Mode : propre
+Requetes totales : 252
+Requetes en echec : 1, coupure d environ 200 ms
+Derniere reponse : HTTP 200

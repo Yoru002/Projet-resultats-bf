@@ -1,19 +1,27 @@
-=== V4 avec application - sam. 10 oct. 2026 17:36:11 GMT ===
+=== V4 avec application - Mon Oct 26 19:26:16     2026 ===
 --- 0. Attente de disponibilite : /sante doit repondre 200 ---
-Dernier code : 200 apres 9.1 s d attente
+Dernier code : 200 apres 0.1 s d attente
 --- 1. Fonctionnement normal (bdd1 primaire) ---
-/sante : HTTP 200 en 0.020908s
-/resultat : HTTP 200 en 0.020276s
+/sante : HTTP 200 en 0.054239s
+/resultat : HTTP 200 en 0.046462s
 --- 2. bdd1 arretee, bdd2 encore en lecture seule ---
-/sante : HTTP 503 en 2.015349s
+/sante : HTTP 503 en 2.090471s
 --- 3. Bascule, puis attente du retour a 200 ---
-[1/4] bdd2 est-elle demarree ?
-[2/4] bdd1 doit etre injoignable (sinon : risque de split-brain)
-[3/4] bdd2 est-elle bien une replique ?
-[4/4] Promotion de bdd2
-OK : bdd2 est maintenant la base primaire.
-Duree de la bascule : 9.7 s
-Dernier code : 200 ; retour a 200 apres 9.7 s (bascule comprise)
+[1/5] bdd2 est-elle demarree ?
+[2/5] bdd1 doit etre injoignable (sinon : risque de split-brain)
+[3/5] bdd2 est-elle bien une replique ?
+[4/5] Promotion de bdd2
+[5/5] Reconfiguration des applications (ordre DB_HOST -> nouvelle primaire bdd2)
+    Applications detectees : app1 app2 app3 app4 
+    -> app1 : mise a jour de l'ordre DB_HOST
+{"host": "app1"}    -> app2 : mise a jour de l'ordre DB_HOST
+{"host": "app2"}    -> app3 : mise a jour de l'ordre DB_HOST
+{"host": "app3"}    -> app4 : mise a jour de l'ordre DB_HOST
+{"host": "app4"}OK : bdd2 est maintenant la base primaire, applications reconfigurees.
+Duree totale de la bascule : 81.3 s
+Dernier code : 200 ; retour a 200 apres 81.7 s (bascule comprise)
 --- 4. Apres bascule (bdd2 primaire) ---
-/sante : HTTP 200 en 0.012915s
-/resultat : HTTP 200 en 0.012009s
+Ordre DB_HOST cote application (preuve du choix C) :
+grep: /etc/default/resultats: Permission denied
+/sante : HTTP 200 en 0.046173s
+/resultat : HTTP 200 en 0.081221s

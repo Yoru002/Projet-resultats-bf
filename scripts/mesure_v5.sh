@@ -39,7 +39,10 @@ printf "GET /resultat?matricule=BF000042 : "
 curl -s --max-time 10 "http://localhost:8080/resultat?matricule=BF000042"
 echo
 
-repl=$(vagrant ssh bdd1 -c "sudo -u postgres psql -tAc \"SELECT count(*) FROM pg_stat_replication WHERE state='streaming'\"" 2>/dev/null | tr -d '\r')
+# tr -cd : on ne garde que les chiffres de la sortie ssh (les séquences
+# d'échappement du terminal, parfois injectées par vagrant ssh, faussaient
+# la comparaison et marquaient ECHEC à tort)
+repl=$(vagrant ssh bdd1 -c "sudo -u postgres psql -tAc \"SELECT count(*) FROM pg_stat_replication WHERE state='streaming'\"" 2>/dev/null | tr -d '\r' | tr -cd '0-9\n')
 echo "Repliques en streaming : $repl"
 [ "$repl" = 1 ] || ok=0
 
