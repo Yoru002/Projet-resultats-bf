@@ -517,7 +517,6 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | Scénario | Résultat | Fichier |
 |---|---|---|
 | **V1** (N=2) | app1 10, app2 10 sur 20 appels, écart de 0 % | `v1-n2.txt` |
- Mesure/v3-pool-connexions
 | **V2** — panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
 | **V4** — bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
 | **V4** — avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
@@ -528,15 +527,6 @@ Compter les lignes différentes de `200` et la durée entre la première et la d
 | **R2** — idempotence | deux `vagrant provision` successifs : codes de sortie 0, aucun fichier ni donnée modifié, aucun service redémarré (240 s) | `r2-idempotence.txt` |
 | **V3** — montée en charge | médiane **124,8 req/s** à N=2 et **135,0 req/s** à N=4 (rapport ×1,08), **0 échec** sur 6 000 requêtes par configuration, 95 % sous 674 ms puis 399 ms | `v3-charge.txt` |
 | V3 — même mesure avant le pool de connexions | 79,3 req/s à N=2 et 47,7 req/s à N=4 (rapport ×0,60), 60 à 87 % de réponses 503 : la sonde `/sante` ouvrait une connexion PostgreSQL par passage et sortait au-delà du timeout de HAProxy | commit `7964eec` |
-=======
-| **V2**, panne d'app1 sous sonde continue | 2 requêtes en échec sur 152, période dégradée de 2,53 s (cible < 5 s) | `v2-panne-app.txt` |
-| **V4**, bascule de la base | 9,7 s, 10,4 s et 10,0 s (moyenne 10,0 s) | `v4-bascule.txt` |
-| **V4**, avec l'application | `/sante` répond 503 pendant la panne, retour à 200 en 9,7 s (bascule comprise) | `v4-application-final.txt` |
-| **V5**, reconstruction du socle | 18 min 26 s (mesure du 24/10) ; plateforme fonctionnelle, `RESULTAT : OK` | `v5-reconstruction.txt` |
-| **V6**, arrêt propre de lb1 | 1 requête perdue sur 253 (environ 200 ms) | `v6-vrrp.txt` |
-| **V6**, arrêt brutal de lb1 | 3 requêtes perdues (environ 2,9 s) puis 2 requêtes perdues (environ 1,5 s) | `v6-vrrp.txt` |
-| **R5**, réplication | ligne écrite sur bdd1, lue sur bdd2 | `r5-replication.txt` |
- main
 | Ordre des bases (avant V3) | environ 86 req/s avec la réplique en premier, environ 156 req/s avec la primaire d'abord (mesure unique) | `docs/journal-donnees.md` |
 
 **En cours** : V1 avec N=4, et une nouvelle mesure de V4 et V6 avec la version actuelle des scripts (la bascule compte désormais 5 étapes, keepalived fait partie du socle).
