@@ -48,7 +48,7 @@ for app in $APPS; do
     || echo "    AVERTISSEMENT : $app non reconfigure (VM injoignable ?)"
   # Vérification que le service répond après redémarrage
   sleep 1
-  vagrant ssh "$app" -c "curl -fsS --max-time 3 http://127.0.0.1:3000/info" < /dev/null \
+  vagrant ssh "$app" -c "curl -fsS --max-time 3 http://127.0.0.1:3000/info && echo" < /dev/null \
     || echo "    AVERTISSEMENT : $app n'a pas repondu apres redemarrage"
 done
 

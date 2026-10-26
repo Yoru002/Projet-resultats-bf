@@ -46,7 +46,7 @@ fin=$(date +%s.%N)
 awk -v d="$debut" -v f="$fin" -v c="$code" 'BEGIN{printf "Dernier code : %s ; retour a 200 apres %.1f s (bascule comprise)\n", c, f-d}'
 echo "--- 4. Apres bascule (bdd2 primaire) ---"
 echo "Ordre DB_HOST cote application (preuve du choix C) :"
-vagrant ssh app1 -c "grep '^DB_HOST=' /etc/default/resultats" < /dev/null || true
+vagrant ssh app1 -c "sudo grep '^DB_HOST=' /etc/default/resultats" < /dev/null || true
 mesure "/sante" /sante
 mesure "/resultat" "/resultat?matricule=BF000001"
 } 2>&1 | tee "${SORTIE}"
