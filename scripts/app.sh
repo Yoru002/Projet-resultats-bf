@@ -36,7 +36,7 @@ install -d -m 755 /opt/resultats
 cat > /tmp/resultats.env <<EOF
 DB_HOST=${PRIMARY_IP},${REPLICA_IP}
 DB_TARGET=read-write
-DB_TIMEOUT=1
+DB_TIMEOUT=2
 DB_POOL=10
 DB_POOL_TIMEOUT=0.5
 DB_PORT=5432
