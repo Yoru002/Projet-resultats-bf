@@ -1,4 +1,4 @@
-=== V1 - Test de répartition (round-robin) - Sat Oct 24 18:29:47     2026 ===
+=== V1 - Test de répartition (round-robin) - Mon Oct 26 16:31:14     2026 ===
 Configuration : NB_APP=2 serveurs applicatifs
 Plateforme : HAProxy round-robin
 
@@ -7,26 +7,26 @@ app2)
 
 Lancement de 20 requêtes /info...
 
-  Requête 1 : app1
-  Requête 2 : app2
-  Requête 3 : app1
-  Requête 4 : app2
-  Requête 5 : app1
-  Requête 6 : app2
-  Requête 7 : app1
-  Requête 8 : app2
-  Requête 9 : app1
-  Requête 10 : app2
-  Requête 11 : app1
-  Requête 12 : app2
-  Requête 13 : app1
-  Requête 14 : app2
-  Requête 15 : app1
-  Requête 16 : app2
-  Requête 17 : app1
-  Requête 18 : app2
-  Requête 19 : app1
-  Requête 20 : app2
+  Requête 1 : app2
+  Requête 2 : app1
+  Requête 3 : app2
+  Requête 4 : app1
+  Requête 5 : app2
+  Requête 6 : app1
+  Requête 7 : app2
+  Requête 8 : app1
+  Requête 9 : app2
+  Requête 10 : app1
+  Requête 11 : app2
+  Requête 12 : app1
+  Requête 13 : app2
+  Requête 14 : app1
+  Requête 15 : app2
+  Requête 16 : app1
+  Requête 17 : app2
+  Requête 18 : app1
+  Requête 19 : app2
+  Requête 20 : app1
 
 === Résultats ===
 Total des requêtes : 20
@@ -42,10 +42,10 @@ Serveur le moins sollicité : app1 (10 requêtes)
 Écart relatif : (10 - 10) / 20 = 0.0 %
 Seuil de conformité : < 20 %
 
-✅ CONFORME : écart de 0.0 % (< 20 %)
+CONFORME : écart de 0.0 % (< 20 %)
 Le round-robin fonctionne correctement.
 
 === Conclusion ===
 Résultat : CONFORME
 
-✅ Test V1 réussi — Répartition équitable
+Test V1 réussi : répartition équitable

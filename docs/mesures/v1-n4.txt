@@ -1,0 +1,55 @@
+=== V1 - Test de répartition (round-robin) - Mon Oct 26 20:14:19     2026 ===
+Configuration : NB_APP=4 serveurs applicatifs
+Plateforme : HAProxy round-robin
+
+Serveurs applicatifs détectés : 4 (app1
+app2
+app3
+app4)
+
+Lancement de 20 requêtes /info...
+
+  Requête 1 : app2
+  Requête 2 : app3
+  Requête 3 : app4
+  Requête 4 : app1
+  Requête 5 : app2
+  Requête 6 : app3
+  Requête 7 : app4
+  Requête 8 : app1
+  Requête 9 : app2
+  Requête 10 : app3
+  Requête 11 : app4
+  Requête 12 : app1
+  Requête 13 : app2
+  Requête 14 : app3
+  Requête 15 : app4
+  Requête 16 : app1
+  Requête 17 : app2
+  Requête 18 : app3
+  Requête 19 : app4
+  Requête 20 : app1
+
+=== Résultats ===
+Total des requêtes : 20
+
+Répartition :
+  app1       :   5 requêtes (25.0%)
+  app2       :   5 requêtes (25.0%)
+  app3       :   5 requêtes (25.0%)
+  app4       :   5 requêtes (25.0%)
+
+=== Analyse ===
+Serveur le plus sollicité : app1 (5 requêtes)
+Serveur le moins sollicité : app1 (5 requêtes)
+
+Écart relatif : (5 - 5) / 20 = 0.0 %
+Seuil de conformité : < 20 %
+
+CONFORME : écart de 0.0 % (< 20 %)
+Le round-robin fonctionne correctement.
+
+=== Conclusion ===
+Résultat : CONFORME
+
+Test V1 réussi : répartition équitable

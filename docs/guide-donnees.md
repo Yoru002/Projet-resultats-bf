@@ -121,7 +121,9 @@ puisque l'application n'a aucun état ; HAProxy reprend la main via /sante.
 Attendu : 200 en fonctionnement normal, 503 pendant la panne, retour à 200
 égal à la durée de la bascule (promotion + reconfiguration des apps), puis
 l'étape 4 affiche `DB_HOST=<bdd2>,<bdd1>` côté application (preuve du choix C).
-Résultats enregistrés dans docs/mesures/v4-application-final.txt.
+Résultats enregistrés dans docs/mesures/v4-application-final.txt, ou dans le fichier
+donné en paramètre. Les 3 essais retenus pour le dossier sont dans
+docs/mesures/v4-essai-1.txt à v4-essai-3.txt.
 
 À refaire après chaque `vagrant provision app1` : le provisionnement réécrit
 `DB_HOST` en ordre initial (bdd1,bdd2), ce qui est normal tant que bdd1 est vivante.

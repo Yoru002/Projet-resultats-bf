@@ -1,7 +1,7 @@
-=== V3 montée en charge - Sun Oct 25 14:47:42     2026 ===
+=== V3 montée en charge - Mon Oct 26 18:17:20     2026 ===
 Commande : ab -n 2000 -c 50 "http://localhost:8080/resultat?matricule=BF000042" ; 3 essais par configuration, médiane retenue
 Configurations : N = 2 4
-Version du dépôt testée : 7964eec (branche main)
+Version du dépôt testée : 88d1c9b (branche main)
 Poste hôte : MINGW64_NT-10.0-26300 3.6.10-5a1665c8.x86_64 x86_64 ; processeurs : 8
 Outils : This is ApacheBench, Version 2.3 <$Revision: 1934973 $> ; Vagrant 2.4.9
 Chaque VM a 1 processeur virtuel ; toutes partagent le processeur de ce poste.
@@ -38,34 +38,34 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   16.027 seconds
+Time taken for tests:   14.955 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    124.79 [#/sec] (mean)
-Time per request:       400.678 [ms] (mean)
-Time per request:       8.014 [ms] (mean, across all concurrent requests)
-Transfer rate:          31.32 [Kbytes/sec] received
+Requests per second:    133.73 [#/sec] (mean)
+Time per request:       373.886 [ms] (mean)
+Time per request:       7.478 [ms] (mean, across all concurrent requests)
+Transfer rate:          33.56 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.5      0       4
-Processing:    15  346 270.9    263    2331
-Waiting:        9  344 270.3    262    2328
-Total:         15  346 270.9    263    2331
+Connect:        0    0   0.5      0       2
+Processing:    18  320 217.9    272    2156
+Waiting:        7  318 217.7    271    2156
+Total:         18  320 217.9    272    2156
 
 Percentage of the requests served within a certain time (ms)
-  50%    263
-  66%    272
-  75%    288
-  80%    362
-  90%    513
-  95%    674
-  98%   1496
-  99%   1687
- 100%   2331 (longest request)
-N=2 essai 1 : 124.79 req/s, échecs 0, non-2xx 0, 95 % sous 674 ms
+  50%    272
+  66%    330
+  75%    345
+  80%    357
+  90%    393
+  95%    462
+  98%   1321
+  99%   1482
+ 100%   2156 (longest request)
+N=2 essai 1 : 133.73 req/s, échecs 0, non-2xx 0, 95 % sous 462 ms
 
 --- N=2, essai 2/3 : sortie brute de ab ---
 This is ApacheBench, Version 2.3 <$Revision: 1934973 $>
@@ -94,34 +94,34 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   13.987 seconds
+Time taken for tests:   14.224 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    142.99 [#/sec] (mean)
-Time per request:       349.663 [ms] (mean)
-Time per request:       6.993 [ms] (mean, across all concurrent requests)
-Transfer rate:          35.89 [Kbytes/sec] received
+Requests per second:    140.61 [#/sec] (mean)
+Time per request:       355.592 [ms] (mean)
+Time per request:       7.112 [ms] (mean, across all concurrent requests)
+Transfer rate:          35.29 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.4      0       2
-Processing:    14  295  47.2    308     372
-Waiting:        6  294  47.0    307     372
-Total:         14  296  47.2    308     372
+Connect:        0    0   0.5      0       2
+Processing:    22  301 147.0    321    1533
+Waiting:       10  300 146.9    321    1533
+Total:         22  301 147.0    322    1533
 
 Percentage of the requests served within a certain time (ms)
-  50%    308
-  66%    327
-  75%    333
-  80%    337
-  90%    346
-  95%    353
-  98%    360
-  99%    365
- 100%    372 (longest request)
-N=2 essai 2 : 142.99 req/s, échecs 0, non-2xx 0, 95 % sous 353 ms
+  50%    322
+  66%    340
+  75%    350
+  80%    354
+  90%    364
+  95%    374
+  98%    389
+  99%   1209
+ 100%   1533 (longest request)
+N=2 essai 2 : 140.61 req/s, échecs 0, non-2xx 0, 95 % sous 374 ms
 
 --- N=2, essai 3/3 : sortie brute de ab ---
 This is ApacheBench, Version 2.3 <$Revision: 1934973 $>
@@ -150,34 +150,34 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   17.162 seconds
+Time taken for tests:   17.068 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    116.54 [#/sec] (mean)
-Time per request:       429.055 [ms] (mean)
-Time per request:       8.581 [ms] (mean, across all concurrent requests)
-Transfer rate:          29.25 [Kbytes/sec] received
+Requests per second:    117.18 [#/sec] (mean)
+Time per request:       426.709 [ms] (mean)
+Time per request:       8.534 [ms] (mean, across all concurrent requests)
+Transfer rate:          29.41 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.5      0       2
-Processing:    14  375 248.5    331    1911
-Waiting:        6  373 247.6    329    1845
-Total:         14  375 248.5    331    1911
+Connect:        0    0   0.6      0       4
+Processing:     8  365 277.6    300    1986
+Waiting:        7  364 277.2    299    1985
+Total:          8  366 277.7    301    1986
 
 Percentage of the requests served within a certain time (ms)
-  50%    331
-  66%    344
-  75%    363
-  80%    386
-  90%    453
-  95%    788
-  98%   1412
-  99%   1540
- 100%   1911 (longest request)
-N=2 essai 3 : 116.54 req/s, échecs 0, non-2xx 0, 95 % sous 788 ms
+  50%    301
+  66%    365
+  75%    377
+  80%    393
+  90%    623
+  95%   1065
+  98%   1365
+  99%   1511
+ 100%   1986 (longest request)
+N=2 essai 3 : 117.18 req/s, échecs 0, non-2xx 0, 95 % sous 1065 ms
 
 ================ N = 4 serveurs applicatifs ================
 --- Répartition de 20 appels à /info ---
@@ -213,34 +213,34 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   13.949 seconds
+Time taken for tests:   16.579 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    143.38 [#/sec] (mean)
-Time per request:       348.723 [ms] (mean)
-Time per request:       6.974 [ms] (mean, across all concurrent requests)
-Transfer rate:          35.99 [Kbytes/sec] received
+Requests per second:    120.64 [#/sec] (mean)
+Time per request:       414.469 [ms] (mean)
+Time per request:       8.289 [ms] (mean, across all concurrent requests)
+Transfer rate:          30.28 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
 Connect:        0    0   0.5      0       2
-Processing:    15  292  70.7    267    1346
-Waiting:        7  291  70.6    266    1346
-Total:         15  292  70.7    267    1346
+Processing:    29  360  80.6    388     576
+Waiting:       13  359  80.4    386     575
+Total:         30  360  80.6    388     577
 
 Percentage of the requests served within a certain time (ms)
-  50%    267
-  66%    315
-  75%    340
-  80%    350
-  90%    377
-  95%    399
-  98%    418
-  99%    422
- 100%   1346 (longest request)
-N=4 essai 1 : 143.38 req/s, échecs 0, non-2xx 0, 95 % sous 399 ms
+  50%    388
+  66%    398
+  75%    406
+  80%    411
+  90%    433
+  95%    466
+  98%    503
+  99%    530
+ 100%    577 (longest request)
+N=4 essai 1 : 120.64 req/s, échecs 0, non-2xx 0, 95 % sous 466 ms
 
 --- N=4, essai 2/3 : sortie brute de ab ---
 This is ApacheBench, Version 2.3 <$Revision: 1934973 $>
@@ -269,34 +269,34 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   15.442 seconds
+Time taken for tests:   16.054 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    129.52 [#/sec] (mean)
-Time per request:       386.053 [ms] (mean)
-Time per request:       7.721 [ms] (mean, across all concurrent requests)
-Transfer rate:          32.51 [Kbytes/sec] received
+Requests per second:    124.58 [#/sec] (mean)
+Time per request:       401.348 [ms] (mean)
+Time per request:       8.027 [ms] (mean, across all concurrent requests)
+Transfer rate:          31.27 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.5      0       3
-Processing:    19  331  65.4    340    1365
-Waiting:        9  330  65.3    338    1364
-Total:         19  332  65.4    340    1365
+Connect:        0    0   0.5      0       2
+Processing:    19  347  72.6    382     500
+Waiting:        7  346  72.5    381     499
+Total:         19  347  72.7    382     502
 
 Percentage of the requests served within a certain time (ms)
-  50%    340
-  66%    360
-  75%    372
-  80%    378
-  90%    401
+  50%    382
+  66%    394
+  75%    400
+  80%    404
+  90%    412
   95%    419
-  98%    433
-  99%    442
- 100%   1365 (longest request)
-N=4 essai 2 : 129.52 req/s, échecs 0, non-2xx 0, 95 % sous 419 ms
+  98%    426
+  99%    430
+ 100%    502 (longest request)
+N=4 essai 2 : 124.58 req/s, échecs 0, non-2xx 0, 95 % sous 419 ms
 
 --- N=4, essai 3/3 : sortie brute de ab ---
 This is ApacheBench, Version 2.3 <$Revision: 1934973 $>
@@ -325,41 +325,41 @@ Document Path:          /resultat?matricule=BF000042
 Document Length:        94 bytes
 
 Concurrency Level:      50
-Time taken for tests:   14.816 seconds
+Time taken for tests:   15.929 seconds
 Complete requests:      2000
 Failed requests:        0
 Total transferred:      514000 bytes
 HTML transferred:       188000 bytes
-Requests per second:    134.99 [#/sec] (mean)
-Time per request:       370.393 [ms] (mean)
-Time per request:       7.408 [ms] (mean, across all concurrent requests)
-Transfer rate:          33.88 [Kbytes/sec] received
+Requests per second:    125.56 [#/sec] (mean)
+Time per request:       398.224 [ms] (mean)
+Time per request:       7.964 [ms] (mean, across all concurrent requests)
+Transfer rate:          31.51 [Kbytes/sec] received
 
 Connection Times (ms)
               min  mean[+/-sd] median   max
-Connect:        0    0   0.5      0       3
-Processing:    15  316  64.6    332    1301
-Waiting:        7  315  64.5    331    1300
-Total:         15  317  64.6    332    1301
+Connect:        0    0   0.5      0       2
+Processing:    34  342  84.9    383     592
+Waiting:       24  341  84.7    382     590
+Total:         35  343  84.9    383     592
 
 Percentage of the requests served within a certain time (ms)
-  50%    332
-  66%    355
-  75%    363
-  80%    369
-  90%    382
-  95%    396
-  98%    413
-  99%    424
- 100%   1301 (longest request)
-N=4 essai 3 : 134.99 req/s, échecs 0, non-2xx 0, 95 % sous 396 ms
+  50%    383
+  66%    398
+  75%    405
+  80%    411
+  90%    425
+  95%    440
+  98%    476
+  99%    495
+ 100%    592 (longest request)
+N=4 essai 3 : 125.56 req/s, échecs 0, non-2xx 0, 95 % sous 440 ms
 
 ================ Synthèse V3 ================
 N    | req/s par essai            | médiane req/s | échecs+non2xx | 95 % sous (ms, médiane)
-2    | 124.79 142.99 116.54       | 124.79         | 0             | 674
-4    | 143.38 129.52 134.99       | 134.99         | 0             | 399
+2    | 133.73 140.61 117.18       | 133.73         | 0             | 462
+4    | 120.64 124.58 125.56       | 124.58         | 0             | 440
 
-Rapport des médianes N=4 / N=2 : x1.08
+Rapport des médianes N=4 / N=2 : x0.93
 
 À commenter dans le dossier : un rapport proche de x1 (ou inférieur) n'est pas
 un échec, toutes les VM partagent le même processeur physique (voir le sujet).

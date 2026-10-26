@@ -1,4 +1,4 @@
-=== V5 reconstruction - Sat Oct 24 12:53:00     2026 ===
+=== V5 reconstruction - Mon Oct 26 11:18:44     2026 ===
 NB_APP=2 LB2=0
 $ vagrant destroy -f
 ==> lb1: Forcing shutdown of VM...
@@ -19,7 +19,7 @@ Bringing machine 'app2' up with 'virtualbox' provider...
 Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> bdd1: Importing base box 'bento/ubuntu-24.04'...
 [KProgress: 30%[K==> bdd1: Matching MAC address for NAT networking...
-==> bdd1: Setting the name of the VM: Projetresultats-bf_bdd1_1792846414428_94854
+==> bdd1: Setting the name of the VM: Projetresultats-bf_bdd1_1793013560465_74163
 ==> bdd1: Clearing any previously set network interfaces...
 ==> bdd1: Preparing network interfaces based on configuration...
     bdd1: Adapter 1: nat
@@ -55,7 +55,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> bdd1: Mounting shared folders...
     bdd1: C:/Users/William OUOBA/Desktop/MASTER/Virtualisation et Cloud Computing/Projet resultats-bf => /vagrant
 ==> bdd1: Running provisioner: shell...
-    bdd1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-stjcm3.sh
+    bdd1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-whkq73.sh
     bdd1: Selecting previously unselected package freeipmi-common.
     bdd1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 46826 files and directories currently installed.)
     bdd1: Preparing to unpack .../00-freeipmi-common_1.6.13-3ubuntu0.2_all.deb ...
@@ -159,7 +159,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     bdd1: 
     bdd1: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> bdd1: Running provisioner: shell...
-    bdd1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-rzzzkp.sh
+    bdd1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-pptel5.sh
     bdd1: Preconfiguring packages ...
     bdd1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 47576 files and directories currently installed.)
     bdd1: Preparing to unpack .../libperl5.38t64_5.38.2-3.2ubuntu0.6_amd64.deb ...
@@ -272,7 +272,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     bdd1: GRANT
 ==> bdd2: Importing base box 'bento/ubuntu-24.04'...
 [KProgress: 30%[K==> bdd2: Matching MAC address for NAT networking...
-==> bdd2: Setting the name of the VM: Projetresultats-bf_bdd2_1792846624136_12844
+==> bdd2: Setting the name of the VM: Projetresultats-bf_bdd2_1793013753532_85258
 ==> bdd2: Fixed port collision for 22 => 2222. Now on port 2200.
 ==> bdd2: Clearing any previously set network interfaces...
 ==> bdd2: Preparing network interfaces based on configuration...
@@ -286,7 +286,6 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     bdd2: SSH address: 127.0.0.1:2200
     bdd2: SSH username: vagrant
     bdd2: SSH auth method: private key
-    bdd2: Warning: Connection reset. Retrying...
     bdd2: 
     bdd2: Vagrant insecure key detected. Vagrant will automatically replace
     bdd2: this with a newly generated keypair for better security.
@@ -310,7 +309,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> bdd2: Mounting shared folders...
     bdd2: C:/Users/William OUOBA/Desktop/MASTER/Virtualisation et Cloud Computing/Projet resultats-bf => /vagrant
 ==> bdd2: Running provisioner: shell...
-    bdd2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-p2hnfb.sh
+    bdd2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-7b6vrc.sh
     bdd2: Selecting previously unselected package freeipmi-common.
     bdd2: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 46826 files and directories currently installed.)
     bdd2: Preparing to unpack .../00-freeipmi-common_1.6.13-3ubuntu0.2_all.deb ...
@@ -414,7 +413,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     bdd2: 
     bdd2: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> bdd2: Running provisioner: shell...
-    bdd2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-vqjyi7.sh
+    bdd2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-yv7sie.sh
     bdd2: Preconfiguring packages ...
     bdd2: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 47576 files and directories currently installed.)
     bdd2: Preparing to unpack .../libperl5.38t64_5.38.2-3.2ubuntu0.6_amd64.deb ...
@@ -521,7 +520,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     bdd2: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> app1: Importing base box 'bento/ubuntu-24.04'...
 [KProgress: 30%[K==> app1: Matching MAC address for NAT networking...
-==> app1: Setting the name of the VM: Projetresultats-bf_app1_1792847028852_5294
+==> app1: Setting the name of the VM: Projetresultats-bf_app1_1793014090333_23972
 ==> app1: Fixed port collision for 22 => 2222. Now on port 2201.
 ==> app1: Clearing any previously set network interfaces...
 ==> app1: Preparing network interfaces based on configuration...
@@ -558,7 +557,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> app1: Mounting shared folders...
     app1: C:/Users/William OUOBA/Desktop/MASTER/Virtualisation et Cloud Computing/Projet resultats-bf => /vagrant
 ==> app1: Running provisioner: shell...
-    app1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-hxmlad.sh
+    app1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-y82ju6.sh
     app1: Selecting previously unselected package freeipmi-common.
     app1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 46826 files and directories currently installed.)
     app1: Preparing to unpack .../00-freeipmi-common_1.6.13-3ubuntu0.2_all.deb ...
@@ -662,7 +661,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     app1: 
     app1: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> app1: Running provisioner: shell...
-    app1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-ycyz7n.sh
+    app1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-ae1gni.sh
     app1: Selecting previously unselected package libapr1t64:amd64.
     app1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 47576 files and directories currently installed.)
     app1: Preparing to unpack .../libapr1t64_1.7.2-3.1ubuntu0.1_amd64.deb ...
@@ -700,7 +699,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     app1: {"host": "app1"} app provisionne, ecoute sur 0.0.0.0:3000
 ==> app2: Importing base box 'bento/ubuntu-24.04'...
 [KProgress: 30%[K==> app2: Matching MAC address for NAT networking...
-==> app2: Setting the name of the VM: Projetresultats-bf_app2_1792847165700_30558
+==> app2: Setting the name of the VM: Projetresultats-bf_app2_1793014225581_86377
 ==> app2: Fixed port collision for 22 => 2222. Now on port 2202.
 ==> app2: Clearing any previously set network interfaces...
 ==> app2: Preparing network interfaces based on configuration...
@@ -737,7 +736,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> app2: Mounting shared folders...
     app2: C:/Users/William OUOBA/Desktop/MASTER/Virtualisation et Cloud Computing/Projet resultats-bf => /vagrant
 ==> app2: Running provisioner: shell...
-    app2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-2wlubl.sh
+    app2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-6ulc63.sh
     app2: Selecting previously unselected package freeipmi-common.
     app2: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 46826 files and directories currently installed.)
     app2: Preparing to unpack .../00-freeipmi-common_1.6.13-3ubuntu0.2_all.deb ...
@@ -841,7 +840,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     app2: 
     app2: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> app2: Running provisioner: shell...
-    app2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-ukrmak.sh
+    app2: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-8sp9ms.sh
     app2: Selecting previously unselected package libapr1t64:amd64.
     app2: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 47576 files and directories currently installed.)
     app2: Preparing to unpack .../libapr1t64_1.7.2-3.1ubuntu0.1_amd64.deb ...
@@ -879,7 +878,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     app2: {"host": "app2"} app provisionne, ecoute sur 0.0.0.0:3000
 ==> lb1: Importing base box 'bento/ubuntu-24.04'...
 [KProgress: 30%[K==> lb1: Matching MAC address for NAT networking...
-==> lb1: Setting the name of the VM: Projetresultats-bf_lb1_1792847317805_50406
+==> lb1: Setting the name of the VM: Projetresultats-bf_lb1_1793014358114_91708
 ==> lb1: Fixed port collision for 22 => 2222. Now on port 2203.
 ==> lb1: Clearing any previously set network interfaces...
 ==> lb1: Preparing network interfaces based on configuration...
@@ -917,7 +916,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
 ==> lb1: Mounting shared folders...
     lb1: C:/Users/William OUOBA/Desktop/MASTER/Virtualisation et Cloud Computing/Projet resultats-bf => /vagrant
 ==> lb1: Running provisioner: shell...
-    lb1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-rw55d8.sh
+    lb1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-6k0xms.sh
     lb1: Selecting previously unselected package freeipmi-common.
     lb1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 46826 files and directories currently installed.)
     lb1: Preparing to unpack .../00-freeipmi-common_1.6.13-3ubuntu0.2_all.deb ...
@@ -1021,7 +1020,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     lb1: 
     lb1: No VM guests are running outdated hypervisor (qemu) binaries on this host.
 ==> lb1: Running provisioner: shell...
-    lb1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261024-14628-m2e66y.sh
+    lb1: Running: C:/Users/WILLIA~1/AppData/Local/Temp/vagrant-shell20261026-18040-mj57z6.sh
     lb1: Selecting previously unselected package liblua5.4-0:amd64.
     lb1: (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 47576 files and directories currently installed.)
     lb1: Preparing to unpack .../liblua5.4-0_5.4.6-3build2_amd64.deb ...
@@ -1058,7 +1057,7 @@ Bringing machine 'lb1' up with 'virtualbox' provider...
     lb1: keepalived actif (MASTER, priorite 150, VIP 192.168.59.5)
     lb1: lb provisionne, HAProxy actif
 Code de sortie de vagrant up : 0
-Duree totale (destroy + up) : 18 min 26 s
+Duree totale (destroy + up) : 16 min 11 s
 --- Controles apres reconstruction ---
 GET /sante : HTTP 200
 GET /resultat?matricule=BF000042 : {"matricule": "BF000042", "nom": "Candidat 42", "serie": "D", "moyenne": 15.54, "admis": true}
