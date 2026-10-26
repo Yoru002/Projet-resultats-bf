@@ -1,99 +1,64 @@
 #!/usr/bin/env python3
-"""Service applicatif RESULTATS-BF, sans état (rôle : ingénieur applicatif).
-
-Points d'entrée :
-  GET /info                   nom d'hôte du serveur qui a répondu (V1)
-  GET /sante                  200 si la base répond, 503 sinon (sonde HAProxy)
-  GET /resultat?matricule=... résultat du candidat en JSON, lu dans PostgreSQL
-
-Sans état : aucune session, aucun cache de résultat ; n'importe quel serveur
-peut prendre la suite d'un autre (V1, V2). Les connexions à PostgreSQL sont
-réutilisées via un pool borné (DB_POOL) : ouvrir une connexion authentifiée
-par requête saturait la base sous charge (50 requêtes concourantes : 1 à 2 s
-par connexion, sonde /sante au-delà du timeout de HAProxy, rafale de 503).
-La base peut être absente au démarrage : le service tourne et renvoie 503
-(piège n°4). Écoute sur 0.0.0.0 et non 127.0.0.1 (piège n°1).
-"""
-import json
-import os
-import queue
-import socket
-import threading
+"""Service applicatif RESULTATS-BF, sans état (moins de 100 lignes : consigne du sujet).
+GET /info (nom d'hôte, V1) ; GET /sante (200 si la base répond, 503 sinon : sonde HAProxy, R4) ;
+GET /resultat?matricule=... (résultat JSON lu dans PostgreSQL). Aucune session ni cache : tout
+l'état vit dans la base. Le pool de connexions (DB_POOL) n'est pas un état métier : il évite une
+connexion authentifiée par requête, qui saturait la base sous charge (V3). Base absente au
+démarrage : le service tourne et répond 503. Écoute sur 0.0.0.0, pas 127.0.0.1 (piège n°1)."""
+import contextlib, json, os, queue, socket, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
-
 import psycopg2
+E = os.environ.get
+DB = {"host": E("DB_HOST", "127.0.0.1"), "port": int(E("DB_PORT", "5432")),
+      "dbname": E("DB_NAME", "resultats"), "user": E("DB_USER", "appuser"),
+      "password": E("DB_PASSWORD", ""), "target_session_attrs": E("DB_TARGET", "any"),
+      "connect_timeout": int(E("DB_TIMEOUT", "3"))}
+TAILLE, ATTENTE = int(E("DB_POOL", "10")), float(E("DB_POOL_TIMEOUT", "0.5"))
+_libres = queue.Queue(maxsize=TAILLE)          # connexions disponibles
+_places = threading.BoundedSemaphore(TAILLE)   # connexions vivantes <= TAILLE
 
-DB = {
-    "host": os.environ.get("DB_HOST", "127.0.0.1"),
-    "port": int(os.environ.get("DB_PORT", "5432")),
-    "dbname": os.environ.get("DB_NAME", "resultats"),
-    "user": os.environ.get("DB_USER", "appuser"),
-    "password": os.environ.get("DB_PASSWORD", ""),
-    "target_session_attrs": os.environ.get("DB_TARGET", "any"),
-    "connect_timeout": int(os.environ.get("DB_TIMEOUT", "3")),
-}
-
-
-TAILLE_POOL = int(os.environ.get("DB_POOL", "10"))
-ATTENTE_POOL = float(os.environ.get("DB_POOL_TIMEOUT", "0.5"))
-
-_libres = queue.Queue(maxsize=TAILLE_POOL)         # connexions disponibles
-_places = threading.BoundedSemaphore(TAILLE_POOL)  # connexions vivantes <= TAILLE
-
-
-class BaseIndisponible(Exception):
-    """Pool saturé : un 503 rapide vaut mieux qu'une file d'attente infinie."""
-
-
-def _connexion():
-    """Connexion du pool, ou une nouvelle si le pool n'est pas plein."""
-    try:
-        cn = _libres.get_nowait()
+def _connexion(neuve=False):
+    """Connexion du pool (sauf si `neuve`), sinon une nouvelle tant qu'il reste de la place."""
+    while not neuve:
+        try:
+            cn = _libres.get_nowait()
+        except queue.Empty:
+            break
         if not cn.closed:
             return cn
-        _places.release()          # connexion périmée : la place est rendue
-    except queue.Empty:
-        pass
-    if not _places.acquire(timeout=ATTENTE_POOL):
-        raise BaseIndisponible("pool de connexions sature")
+        _places.release()                      # connexion périmée : place rendue
+    if not _places.acquire(timeout=ATTENTE):   # pool saturé : un 503 rapide, pas une file
+        raise RuntimeError("pool de connexions sature")
     try:
-        return psycopg2.connect(**DB)   # échoue si la base est absente/injoignable
+        cn = psycopg2.connect(**DB)            # échoue si la base est absente
+        cn.autocommit = True                   # sinon : connexion « idle in transaction »
+        return cn
     except BaseException:
         _places.release()
         raise
 
-
-def _rendre(cn):
-    _libres.put_nowait(cn)         # jamais plein : <= TAILLE connexions vivantes
-
-
-def _abandonner(cn):
-    try:
-        cn.close()
-    finally:
-        _places.release()
-
-
 def requete(sql, params=()):
-    """Première ligne du résultat, ou None. Connexion empruntée puis rendue."""
-    for essai in (1, 2):           # 2e essai : élimine une connexion périmée (bascule)
-        cn = _connexion()
+    """Première ligne du résultat, ou None. 2e essai sur connexion neuve (après bascule)."""
+    for essai in (1, 2):
+        cn = _connexion(neuve=essai == 2)
         try:
             with cn.cursor() as cur:
                 cur.execute(sql, params)
                 ligne = cur.fetchone()
         except Exception:
-            _abandonner(cn)
+            try:
+                cn.close()
+            finally:
+                _places.release()
             if essai == 2:
                 raise
-            continue
-        _rendre(cn)
-        return ligne
-
+        else:
+            _libres.put_nowait(cn)             # jamais plein : <= TAILLE connexions vivantes
+            return ligne
 
 class Handler(BaseHTTPRequestHandler):
-    protocol_version = "HTTP/1.1"        # keep-alive : nécessaire pour les mesures ab
+    protocol_version = "HTTP/1.1"              # keep-alive : nécessaire pour les mesures ab
 
     def _json(self, code, objet):
         corps = json.dumps(objet).encode()
@@ -101,54 +66,34 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(corps)))
         self.end_headers()
-        self.wfile.write(corps)
+        with contextlib.suppress(OSError):     # la sonde HAProxy ferme parfois sans lire le corps
+            self.wfile.write(corps)
 
     def do_GET(self):
-        url = urlparse(self.path)
-        if url.path == "/info":   # V1 : observe la répartition entre serveurs
-            self._json(200, {"host": socket.gethostname()})
-        elif url.path == "/sante":
-            # R4 : la sonde doit VÉRIFIER la base, jamais renvoyer 200 par principe
+        url, hote = urlparse(self.path), socket.gethostname()
+        if url.path == "/info": return self._json(200, {"host": hote})
+        if url.path == "/sante":               # R4 : vérifie la base, jamais 200 par principe
             try:
                 requete("SELECT 1")
-                self._json(200, {"ok": True, "host": socket.gethostname()})
             except Exception as exc:
                 self.log_error("sante : base injoignable (%s)", exc)
-                self._json(503, {"ok": False, "host": socket.gethostname()})
-        elif url.path == "/resultat":
-            self._resultat(parse_qs(url.query))
-        else:
-            self._json(404, {"erreur": "inconnu"})
-
-    def _resultat(self, query):
-        matricule = (query.get("matricule") or [""])[0]
+                return self._json(503, {"ok": False, "host": hote})
+            return self._json(200, {"ok": True, "host": hote})
+        if url.path != "/resultat":
+            return self._json(404, {"erreur": "inconnu"})
+        matricule = (parse_qs(url.query).get("matricule") or [""])[0]
         if not matricule:
-            self._json(400, {"erreur": "paramètre matricule manquant"})
-            return
+            return self._json(400, {"erreur": "paramètre matricule manquant"})
         try:
-            ligne = requete(   # requête paramétrée : pas d'injection possible
-                "SELECT nom, serie, moyenne, admis FROM resultats WHERE matricule = %s",
-                (matricule,))
+            ligne = requete("SELECT nom, serie, moyenne, admis FROM resultats "
+                            "WHERE matricule = %s", (matricule,))   # requête paramétrée
         except Exception as exc:
             self.log_error("resultat : base indisponible (%s)", exc)
-            self._json(503, {"erreur": "base indisponible"})
-            return
+            return self._json(503, {"erreur": "base indisponible"})
         if ligne is None:
-            self._json(404, {"erreur": "matricule inconnu", "matricule": matricule})
-            return
-        nom, serie, moyenne, admis = ligne
-        self._json(200, {"matricule": matricule, "nom": nom, "serie": serie,
-                         "moyenne": float(moyenne), "admis": bool(admis)})
-
-    def do_HEAD(self):   # en-têtes seuls, sans corps ni accès à la base
-        code = 200 if urlparse(self.path).path == "/info" else 404
-        self.send_response(code)
-        self.send_header("Content-Length", "0")
-        self.end_headers()
-
-    def do_POST(self):
-        self._json(405, {"erreur": "méthode non autorisée"})
+            return self._json(404, {"erreur": "matricule inconnu", "matricule": matricule})
+        self._json(200, {"matricule": matricule, "nom": ligne[0], "serie": ligne[1],
+                         "moyenne": float(ligne[2]), "admis": bool(ligne[3])})
 
 if __name__ == "__main__":
-    port = int(os.environ.get("APP_PORT", "3000"))
-    ThreadingHTTPServer(("0.0.0.0", port), Handler).serve_forever()
+    ThreadingHTTPServer(("0.0.0.0", int(E("APP_PORT", "3000"))), Handler).serve_forever()
