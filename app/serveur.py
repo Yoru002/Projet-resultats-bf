@@ -5,7 +5,7 @@ GET /resultat?matricule=... (résultat JSON lu dans PostgreSQL). Aucune session 
 l'état vit dans la base. Le pool de connexions (DB_POOL) n'est pas un état métier : il évite une
 connexion authentifiée par requête, qui saturait la base sous charge (V3). Base absente au
 démarrage : le service tourne et répond 503. Écoute sur 0.0.0.0, pas 127.0.0.1 (piège n°1)."""
-import json, os, queue, socket, threading
+import contextlib, json, os, queue, socket, threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
 import psycopg2
@@ -66,19 +66,19 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(corps)))
         self.end_headers()
-        self.wfile.write(corps)
+        with contextlib.suppress(OSError):     # la sonde HAProxy ferme parfois sans lire le corps
+            self.wfile.write(corps)
 
     def do_GET(self):
         url, hote = urlparse(self.path), socket.gethostname()
-        if url.path == "/info":
-            return self._json(200, {"host": hote})
+        if url.path == "/info": return self._json(200, {"host": hote})
         if url.path == "/sante":               # R4 : vérifie la base, jamais 200 par principe
             try:
                 requete("SELECT 1")
-                return self._json(200, {"ok": True, "host": hote})
             except Exception as exc:
                 self.log_error("sante : base injoignable (%s)", exc)
                 return self._json(503, {"ok": False, "host": hote})
+            return self._json(200, {"ok": True, "host": hote})
         if url.path != "/resultat":
             return self._json(404, {"erreur": "inconnu"})
         matricule = (parse_qs(url.query).get("matricule") or [""])[0]
