@@ -282,7 +282,7 @@ Toutes les commandes se lancent sur le poste hôte, depuis la racine du dépôt.
 - **V3** se lance avec 2 serveurs et les extensions éteintes. Il passe lui-même à 4 serveurs et laisse la plateforme ainsi (pour revenir à 2, voir [6.1](#61-ajouter-ou-retirer-des-serveurs)). `ab` doit tourner sur le poste hôte, pas dans une VM.
 - **V4** laisse bdd2 en primaire. Avant de le refaire, reconstruire les deux bases (voir [6.2](#62-basculer-la-base-sur-bdd2)).
 - **V5** détruit toutes les machines avant de les reconstruire. Il demande confirmation (`-y` pour ne pas la demander).
-- **V6** laisse lb1 arrêtée. Pour la remettre : `vagrant up lb1`.
+- **V6** laisse lb1 arrêtée. Avant un nouvel essai, la remettre avec `vagrant up lb1` et attendre qu'elle reprenne l'adresse virtuelle (`vagrant ssh lb1 -c "ip addr | grep 192.168.59.5"` doit afficher une ligne). Sinon, l'essai ne mesure aucune panne : lb2 a déjà l'adresse.
 
 ### 8.2 Exigences du sujet
 
